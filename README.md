@@ -22,10 +22,12 @@ The following steps are automatically runned withing gitpod, if you are doing a 
 
 ```sh
 pipenv install;
+pipenv shell
 mysql -u root -e "CREATE DATABASE example";
 pipenv run init;
 pipenv run migrate;
 pipenv run upgrade;
+pipenv run start
 ```
 
 ## How to Start coding?
