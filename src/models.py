@@ -11,8 +11,8 @@ class Usuario(db.Model):
     fecha_nacimiento = db.Column(db.DateTime(timezone=True))
     correo = db.Column(db.String(50), unique=True, nullable=False)
     telefono= db.Column(db.String(20), unique=False, nullable=False)
-    clave_hash = db.Column(db.String(80), unique=False, nullable=False)
-    foto_perfil = db.Column(db.String(120), unique=False, nullable=False)
+    clave_hash = db.Column(db.String(50), unique=False, nullable=False)
+    foto_perfil = db.Column(db.String(50), unique=False, nullable=True)
     administrador = db.Column(db.Boolean(), unique=False, nullable=False)
     suscripcion = db.Column(db.Integer, unique=False, nullable=True)
 
@@ -73,7 +73,7 @@ class Usuario(db.Model):
             "telefono":self.telefono,
             #La clave no se serializa,
             "foto_perfil":self.foto_perfil,
-            "suscripcion":self.suscripcion 
+            "suscripcion":self.suscripcion, 
             "administrador":self.administrador
         }
 

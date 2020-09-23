@@ -9,6 +9,8 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, Usuario
+from smail import sendEmail
+from stele import sendTelegram
 #from models import Person
 
 app = Flask(__name__)
@@ -42,9 +44,9 @@ def cr_usuario():
         #   crear una variable lista y asignarle todos los donantes que devuelva la consulta
         usuarios = Usuario.query.all()
         # verificamos si hay parámetros en la url y filtramos la lista con eso
-        name = request.args.get("name")
-        if name is not None:
-            usuarios_filtrados = filter(lambda usuario: name.lower() in usuario.nombre_completo.lower(), usuarios)
+        nombre = request.args.get("nombre")
+        if nombre is not None:
+            usuarios_filtrados = filter(lambda usuario: nombre.lower() in usuario.nombre_completo.lower(), usuarios)
         else:
             usuarios_filtrados = usuarios
         #   serializar los objetos de la lista - tendría una lista de diccionarios
@@ -57,7 +59,7 @@ def cr_usuario():
         dato_reg = request.json # request.get_json()
         if dato_reg is None:
             return jsonify({
-                "resultado": "no envió insumos para crear el donante..."
+                "resultado": "no envió la informacion para crear el usuario..."
             }), 400
         #   verificar que el diccionario tenga cedula, nombre, apellido
         if (
@@ -70,7 +72,7 @@ def cr_usuario():
             "clave" not in dato_reg
         ):
             return jsonify({
-                "resultado": "revise las propiedades de su solicitud"
+                "resultado": "Favor verifique la informacion enviada faltan algunos campos obligatorios"
             }), 400
         #   validar que campos no vengan vacíos y que cédula tenga menos de 14 caracteres
         if (
@@ -111,6 +113,39 @@ def cr_usuario():
                 "resultado": f"{error.args}"
             }), 500
 
+
+@app.route("/SendCorreo", methods = ['POST'])
+def SendCorreo():
+
+    # Verificamos el método
+    if (request.method == 'POST'):
+
+        # Obtenemos los datos de la forma
+        nombre = request.form['nombre']
+        correo = request.form['correo']
+        mensaje = request.form['mensaje']
+        respuesta = sendEmail(nombre,correo,mensaje)
+        #flash(respuesta, 'alert-success')
+        #print(respuesta)
+        # Redirigimos a mensaje
+        return jsonify(respuesta), 200
+
+# Para enviar Telegram
+@app.route("/SendTelegram", methods = ['POST'])
+def SendTelegram():
+
+    # Verificamos el método
+    if (request.method == 'POST'):
+
+        # Obtenemos los datos de la forma
+        nombre = request.form['nombre']
+        telegram = request.form['telegram']
+        mensaje = request.form['mensaje']
+
+        #idTelegram = " {} "+telegram
+        response = sendTelegram(nombre,telegram, mensaje)
+        
+        return response
 
 
 # this only runs if `$ python src/main.py` is executed
