@@ -104,6 +104,12 @@ def cr_usuario():
         db.session.add(nuevo_usuario)
         try:
             db.session.commit()
+            titulocorreo= "Registro satisfactorio"
+            nombre=dato_reg["nombre"]
+            correo=dato_reg["correo"]
+            nombreusuario=dato_reg["nombre_usuario"]
+            mensaje = f"gracias por registrarse su usuario es {nombreusuario}"
+            sendEmail(titulocorreo, nombre, correo, mensaje)
             # devolvemos el nuevo donante serializado y 201_CREATED
             return jsonify(nuevo_usuario.serializar()), 201
         except Exception as error:

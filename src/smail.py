@@ -24,13 +24,13 @@ def sendEmail(titulocorreo,nombre,correo,men):
     
     
     
-    message = nombre+men+"n Thank you"
+    message = nombre+ "\n"+men+ "\n" + "\n"+" Gracias Recuerde que puede visitar nuestro bot en telegram"
     
     # setup the parameters of the message
     password = os.environ.get('PASSWORD_EMAIL')
     msg['From'] = "vendegram@gmail.com"
     msg['To'] = correo
-    msg['Subject'] = titulocorreo+" "+nombre
+    msg['Subject'] = titulocorreo+" "+nombre.lower().capitalize()
     
     # add in the message body
     msg.attach(MIMEText(message, 'plain'))
