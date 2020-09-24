@@ -1,5 +1,6 @@
 # import necessary packages
 
+import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -17,7 +18,7 @@ app.config.update(
 mail = Mail(app)
 
 '''
-def sendEmail(nombre,correo,men):
+def sendEmail(titulocorreo,nombre,correo,men):
     # create message object instance
     msg = MIMEMultipart()
     
@@ -26,10 +27,10 @@ def sendEmail(nombre,correo,men):
     message = nombre+men+"n Thank you"
     
     # setup the parameters of the message
-    password = "vendegram123*"
+    password = os.environ.get('PASSWORD_EMAIL')
     msg['From'] = "vendegram@gmail.com"
     msg['To'] = correo
-    msg['Subject'] = "Subscription "+nombre
+    msg['Subject'] = titulocorreo+" "+nombre
     
     # add in the message body
     msg.attach(MIMEText(message, 'plain'))

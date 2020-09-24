@@ -1,9 +1,11 @@
+
+import os
 import requests
 from flask import  jsonify
 
 def telegram_bot_sendtext(bot_message):
     
-    bot_token = '1039242221:AAHqzyXt8Y-Nwfd35u0H-eNpKfVzxx9CB7k'
+    bot_token = os.environ.get('TOKEN_TELE')
     bot_chatID = '677779190'
     send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
 
@@ -18,7 +20,7 @@ def sendTelegram(nombre,telegram,mensaje):
 
     bot_message = "Buen dia "+ nombre +"\n"+" El presente es para saludarlo e indicarle"+"\n"+mensaje
 
-    bot_token = '1039242221:AAHqzyXt8Y-Nwfd35u0H-eNpKfVzxx9CB7k'
+    bot_token = os.environ.get('TOKEN_TELE')
     bot_chatID = telegram
     send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
 

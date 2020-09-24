@@ -32,6 +32,7 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+#Obtiene todos los nombres y filtra por nombre
 @app.route("/usuario", methods=["GET", "POST"])
 def cr_usuario():
     """
@@ -114,6 +115,62 @@ def cr_usuario():
             }), 500
 
 
+
+@app.route("/usuario/<id>", methods=["GET", "PATCH", "DELETE"])
+def crud_usuario(id):
+    """
+        GET: devolver el detalle de un usuario específico
+        PATCH: actualizar datos del usuario específico,
+            guardar en base de datos y devolver el detalle
+        DELETE: eliminar el usuario específico y devolver 204 
+    """
+    # crear una variable y asignar el donante específico
+    usuario = Usuario.query.get(id)
+    # verificar si el donante con id donante_id existe
+    if isinstance(usuario, Usuario):
+        if request.method == "GET":
+            # devolver el donante serializado y jsonificado. Y 200
+            return jsonify(usuario.serializar()), 200
+        elif request.method == "PATCH":
+            # recuperar diccionario con insumos del body del request
+            diccionario = request.get_json()
+            # actualizar propiedades que vengan en el diccionario
+            usuario.actualizar_usuario(diccionario)
+            # guardar en base de datos, hacer commit
+            try:
+                db.session.commit()
+                # devolver el donante serializado y jsonificado. Y 200 
+                return jsonify(usuario.serializar()), 200
+            except Exception as error:
+                db.session.rollback()
+                print(f"{error.args} {type(error)}")
+                return jsonify({
+                    "resultado": f"{error.args}"
+                }), 500
+        else:
+            # remover el donante específico de la sesión de base de datos
+            db.session.delete(usuario)
+            # hacer commit y devolver 204
+            try:
+                db.session.commit()
+                return jsonify({
+                    "resultado": "el contacto fue eliminado"
+                }), 204
+            except Exception as error:
+                db.session.rollback()
+                print(f"{error.args} {type(error)}")
+                return jsonify({
+                    "resultado": f"{error.args}"
+                }), 500
+    else:
+        # el usuario no existe!
+        return jsonify({
+            "resultado": "el contacto que ingreso no existe..."
+        }), 404
+
+
+
+#Para enviar correo usando la cuenta de VendeGram
 @app.route("/SendCorreo", methods = ['POST'])
 def SendCorreo():
 
@@ -121,16 +178,17 @@ def SendCorreo():
     if (request.method == 'POST'):
 
         # Obtenemos los datos de la forma
+        titulocorreo = request.form['titulocorreo']
         nombre = request.form['nombre']
         correo = request.form['correo']
         mensaje = request.form['mensaje']
-        respuesta = sendEmail(nombre,correo,mensaje)
+        respuesta = sendEmail(titulocorreo, nombre, correo, mensaje)
         #flash(respuesta, 'alert-success')
         #print(respuesta)
         # Redirigimos a mensaje
         return jsonify(respuesta), 200
 
-# Para enviar Telegram
+# Para enviar mensajes por Telegram mendiante su API
 @app.route("/SendTelegram", methods = ['POST'])
 def SendTelegram():
 
@@ -138,12 +196,13 @@ def SendTelegram():
     if (request.method == 'POST'):
 
         # Obtenemos los datos de la forma
+        
         nombre = request.form['nombre']
         telegram = request.form['telegram']
         mensaje = request.form['mensaje']
 
         #idTelegram = " {} "+telegram
-        response = sendTelegram(nombre,telegram, mensaje)
+        response = sendTelegram(nombre, telegram, mensaje)
         
         return response
 
