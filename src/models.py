@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone
+from datetime import datetime, date, timezone
 
 db = SQLAlchemy()
 
@@ -8,7 +8,7 @@ class Usuario(db.Model):
     nombre = db.Column(db.String(50), unique=False, nullable=False)
     apellido = db.Column(db.String(50), unique=False, nullable=False)
     nombre_usuario = db.Column(db.String(20), unique=True, nullable=False)
-    fecha_nacimiento = db.Column(db.DateTime(timezone=True))
+    fecha_nacimiento = db.Column(db.Date())
     correo = db.Column(db.String(50), unique=True, nullable=False)
     telefono= db.Column(db.String(20), unique=False, nullable=False)
     clave_hash = db.Column(db.String(50), unique=False, nullable=False)
@@ -44,13 +44,13 @@ class Usuario(db.Model):
             esos insumos y devuelve la instancia creada.
         """
         nuevo_usuario = cls(
-            nombre.lower().capitalize(),
-            apellido.lower().capitalize(),
-            nombre_usuario,
+            nombre.title().strip(),
+            apellido.title().strip(),
+            nombre_usuario.strip(),
             fecha_nacimiento,
-            correo.casefold(),
+            correo.casefold().strip(),
             telefono,
-            clave,
+            clave.strip(),
             foto_perfil,
             administrador,
             suscripcion
@@ -63,15 +63,19 @@ class Usuario(db.Model):
         return f"{self.nombre} {self.apellido}"
 
     def serializar(self):
+
+        date_str = str(self.fecha_nacimiento)
+        date_object = datetime.strptime(date_str, '%Y-%m-%d').date()
+        print(type(date_object))
+        print(date_object) 
         return {
             "id": self.id,
             "nombre": self.nombre,
             "apellido":self.apellido,
             "nombre_usuario":self.nombre_usuario,
-            "fecha_nacimiento":self.fecha_nacimiento, 
+            "fecha_nacimiento":date_str, 
             "correo":self.correo,
             "telefono":self.telefono,
-            #La clave no se serializa,
             "foto_perfil":self.foto_perfil,
             "suscripcion":self.suscripcion, 
             "administrador":self.administrador
@@ -81,24 +85,22 @@ class Usuario(db.Model):
     def actualizar_usuario(self, diccionario):
         """ actualiza propiedades del usuario según el contenido del diccionario """
 
-        if "email" in diccionario:
-            self.email = diccionario["email"]
         if "nombre" in diccionario:
-            self.nombre = diccionario["nombre"]
+            self.nombre = diccionario["nombre"].title().strip()
         if "apellido" in diccionario:
-            self.apellido = diccionario["apellido"]
+            self.apellido = diccionario["apellido"].title().strip()
         if "nombre_usuario" in diccionario:
-            self.nombre_usuario = diccionario["nombre_usuario"]
+            self.nombre_usuario = diccionario["nombre_usuario"].strip()
         if "fecha_nacimiento" in diccionario:
             self.fecha_nacimiento = diccionario["fecha_nacimiento"]
         if "correo" in diccionario:
-            self.correo = diccionario["correo"]
+            self.correo = diccionario["correo"].casefold().strip()
         if "telefono" in diccionario:
-            self.telefono = diccionario["telefono"]
+            self.telefono = diccionario["telefono"].strip()
         if "clave" in diccionario:
-            self.clave_hash = diccionario["clave"]
+            self.clave_hash = diccionario["clave"].strip()
         if "foto_perfil" in diccionario:
-            self.foto_perfil = diccionario["foto_perfil"]
+            self.foto_perfil = diccionario["foto_perfil"].strip()
         if "suscripcion" in diccionario:
             self.suscripcion = diccionario["suscripcion"]    
 

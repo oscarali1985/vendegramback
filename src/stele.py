@@ -18,7 +18,7 @@ def telegram_bot_sendtext(bot_message):
 
 def sendTelegram(nombre,telegram,mensaje):
 
-    bot_message = "Buen dia "+ nombre +"\n"+" El presente es para saludarlo e indicarle"+"\n"+mensaje
+    bot_message = "Buen dia "+ nombre +"\n"+" "+"\n"+mensaje
 
     bot_token = os.environ.get('TOKEN_TELE')
     bot_chatID = telegram

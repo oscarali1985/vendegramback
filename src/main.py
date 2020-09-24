@@ -62,7 +62,7 @@ def cr_usuario():
             return jsonify({
                 "resultado": "no envió la informacion para crear el usuario..."
             }), 400
-        #   verificar que el diccionario tenga cedula, nombre, apellido
+        #   verificar que el diccionario tenga los campos requeridos nombre, apellido, correo, telefono y clave
         if (
             "nombre" not in dato_reg or
             "apellido" not in  dato_reg or
@@ -88,11 +88,11 @@ def cr_usuario():
         #   crear una variable y asignarle el nuevo donante con los datos validados
         
         nuevo_usuario = Usuario.registrarse(
-            dato_reg["nombre"],
-            dato_reg["apellido"],
+            dato_reg["nombre"].lower().capitalize(),
+            dato_reg["apellido"].lower().capitalize(),
             dato_reg["nombre_usuario"],
             dato_reg["fecha_nacimiento"],
-            dato_reg["correo"],
+            dato_reg["correo"].casefold(),
             dato_reg["telefono"],
             dato_reg["clave"],
             dato_reg["foto_perfil"],
@@ -104,12 +104,12 @@ def cr_usuario():
         db.session.add(nuevo_usuario)
         try:
             db.session.commit()
-            titulocorreo= "Registro satisfactorio"
-            nombre=dato_reg["nombre"]
-            correo=dato_reg["correo"]
-            nombreusuario=dato_reg["nombre_usuario"]
-            mensaje = f"gracias por registrarse su usuario es {nombreusuario}"
-            sendEmail(titulocorreo, nombre, correo, mensaje)
+            #titulocorreo= "Registro satisfactorio"
+            #nombre=dato_reg["nombre"]
+            #correo=dato_reg["correo"]
+            #nombreusuario=dato_reg["nombre_usuario"]
+            #mensaje = f"gracias por registrarse su usuario es {nombreusuario}"
+            #email = sendEmail(titulocorreo, nombre, correo, mensaje)
             # devolvemos el nuevo donante serializado y 201_CREATED
             return jsonify(nuevo_usuario.serializar()), 201
         except Exception as error:
@@ -141,6 +141,7 @@ def crud_usuario(id):
             # recuperar diccionario con insumos del body del request
             diccionario = request.get_json()
             # actualizar propiedades que vengan en el diccionario
+            print(diccionario)
             usuario.actualizar_usuario(diccionario)
             # guardar en base de datos, hacer commit
             try:
