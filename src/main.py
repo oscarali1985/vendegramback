@@ -8,10 +8,9 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, Usuario
+from models import db, Usuario, Producto
 from smail import sendEmail
 from stele import sendTelegram
-from models import db, Producto
 
 
 app = Flask(__name__)
@@ -32,6 +31,7 @@ def handle_invalid_usage(error):
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
+
 
 #Obtiene todos los nombres y filtra por nombre
 @app.route("/usuario", methods=["GET", "POST"])
@@ -82,7 +82,11 @@ def cr_usuario():
             dato_reg["apellido"] == "" or
             dato_reg["nombre_usuario"] == ""
             #len(str(insumos_donante["cedula"])) > 14
-#   crear una variable y asignarle el nuevo usuario con los datos validados
+        ):
+            return jsonify({
+                "resultado": "revise los valores de su solicitud"
+            }), 400
+        #   crear una variable y asignarle el nuevo donante con los datos validados
         
         nuevo_usuario = Usuario.registrarse(
             dato_reg["nombre"].lower().capitalize(),
@@ -109,10 +113,16 @@ def cr_usuario():
             #email = sendEmail(titulocorreo, nombre, correo, mensaje)
             # devolvemos el nuevo donante serializado y 201_CREATED
             return jsonify(nuevo_usuario.serializar()), 201
+        except Exception as error:
+            db.session.rollback()
+            print(f"{error.args} {type(error)}")
+            # devolvemos "mira, tuvimos este error..."
+            return jsonify({
+                "resultado": f"{error.args}"
+            }), 500
 
 
-
-@app.route("/usuario/<id>", methods=["GET", "PATCH", "DELETE"])
+@app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
 def crud_usuario(id):
     """
         GET: devolver el detalle de un usuario específico
@@ -235,45 +245,6 @@ def todos_productos():
 
 
 
-
-
-#Para enviar correo usando la cuenta de VendeGram
-@app.route("/SendCorreo", methods = ['POST'])
-def SendCorreo():
-
-    # Verificamos el método
-    if (request.method == 'POST'):
-
-        # Obtenemos los datos de la forma
-        titulocorreo = request.form['titulocorreo']
-        nombre = request.form['nombre']
-        correo = request.form['correo']
-        mensaje = request.form['mensaje']
-        respuesta = sendEmail(titulocorreo, nombre, correo, mensaje)
-        #flash(respuesta, 'alert-success')
-        #print(respuesta)
-        # Redirigimos a mensaje
-        return jsonify(respuesta), 200
-
-# Para enviar mensajes por Telegram mendiante su API
-@app.route("/SendTelegram", methods = ['POST'])
-def SendTelegram():
-
-    # Verificamos el método
-    if (request.method == 'POST'):
-
-        # Obtenemos los datos de la forma
-        
-        nombre = request.form['nombre']
-        telegram = request.form['telegram']
-        mensaje = request.form['mensaje']
-
-        #idTelegram = " {} "+telegram
-        response = sendTelegram(nombre, telegram, mensaje)
-        
-        return response
-
-
 ##########  4.- Eliminar un producto DELETE /producto/{producto_id} ########### 
 
 @app.route('/delete/<int:producto_id>', methods=['DELETE'])
@@ -328,6 +299,74 @@ def actualizar_producto(producto_id):
         return jsonify({
             "Presente error al actualizar un producto": f"{error.args}"
         }), 500    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Para enviar correo usando la cuenta de VendeGram
+@app.route("/SendCorreo", methods = ['POST'])
+def SendCorreo():
+
+    # Verificamos el método
+    if (request.method == 'POST'):
+
+        # Obtenemos los datos de la forma
+        titulocorreo = request.form['titulocorreo']
+        nombre = request.form['nombre']
+        correo = request.form['correo']
+        mensaje = request.form['mensaje']
+        respuesta = sendEmail(titulocorreo, nombre, correo, mensaje)
+        #flash(respuesta, 'alert-success')
+        #print(respuesta)
+        # Redirigimos a mensaje
+        return jsonify(respuesta), 200
+
+# Para enviar mensajes por Telegram mendiante su API
+@app.route("/SendTelegram", methods = ['POST'])
+def SendTelegram():
+
+    # Verificamos el método
+    if (request.method == 'POST'):
+
+        # Obtenemos los datos de la forma
+        
+        nombre = request.form['nombre']
+        telegram = request.form['telegram']
+        mensaje = request.form['mensaje']
+
+        #idTelegram = " {} "+telegram
+        response = sendTelegram(nombre, telegram, mensaje)
+        
+        return response
+
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

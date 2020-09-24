@@ -1,0 +1,25 @@
+// Insertar usuario
+
+{
+	"nombre": "Oscar Ali",
+	"apellido": "Mariño",
+	"nombre_usuario": "oscarali1984",
+	"fecha_nacimiento": "1985/05/25",
+	"correo": "oscar1985@gmail.com",
+	"telefono": "584126147743",
+	"clave":"1234",
+	"foto_perfil": "foto",
+    "administrador": true,
+    "suscripcion": null
+}
+
+//Insertar Producto
+
+{
+    "titulo": "Prueba 2",	
+         "foto": "uno",
+         "descripcion": "TEST",
+     "cantidad": 5,
+     "precio": 20.0
+  
+   }

@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timezone
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime, Float
+
 
 db = SQLAlchemy()
 
@@ -108,8 +110,8 @@ class Usuario(db.Model):
         #     if hasattr(self, key) and key != "cedula":
         #         self[key] = value
         return True
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime, Float
-db = SQLAlchemy()
+
+
 
 class Producto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
