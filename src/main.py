@@ -32,7 +32,11 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-
+########################35
+#
+#    Usuarios
+#
+########################
 #Obtiene todos los nombres y filtra por nombre
 @app.route("/usuario", methods=["GET", "POST"])
 def cr_usuario():
@@ -174,6 +178,31 @@ def crud_usuario(id):
         return jsonify({
             "resultado": "el contacto que ingreso no existe..."
         }), 404
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################201
+#
+#    Productos
+#
+########################
 
 
 ###################        CRUD de Vendegram !!!    ######################  
@@ -324,11 +353,11 @@ def actualizar_producto(producto_id):
 
 
 
-
-
-
-
-
+########################356
+#
+#    Envoar ccorreo o mensajes telegram
+#
+########################
 
 #Para enviar correo usando la cuenta de VendeGram
 @app.route("/SendCorreo", methods = ['POST'])

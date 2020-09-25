@@ -3,8 +3,21 @@ from datetime import datetime, date, timezone
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime, Float
 
 
+
+
+# Mas importaciones
+
+
+
+
 db = SQLAlchemy()
 
+
+########################15
+#
+#    Usuarios
+#
+########################
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(50), unique=False, nullable=False)
@@ -113,6 +126,133 @@ class Usuario(db.Model):
 
 
 
+
+
+
+
+
+
+########################134
+#
+#    Suscripcion
+#
+########################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################191
+#
+#    Tienda
+#
+########################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################
+#
+#    ZONA
+#
+########################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################136
+#
+#    Productos
+#
+########################
+
+
 class Producto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(100), nullable=False)
@@ -172,3 +312,76 @@ class Producto(db.Model):
             "cantidad": self.cantidad
            # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
         }       
+
+
+
+
+
+
+
+
+
+
+
+########################
+#
+#    Etiqueta
+#
+########################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################
+#
+#    Calificacion
+#
+########################
