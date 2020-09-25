@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timezone
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime, Float
+import enum
 
 
 
@@ -253,6 +254,15 @@ class Usuario(db.Model):
 ########################
 
 
+class Etiqueta(enum.Enum):   
+    ALIMENTOS = "alimentos"
+    BEBIDAS = "bebidas"
+    SALSAS = "salsas"
+    ENLATADOS = "enlatados"
+    REFRESCOS = "refrescos"
+    JUGOS = "jugos"
+    CEREALES = "cereales"
+
 class Producto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(100), nullable=False)
@@ -260,17 +270,24 @@ class Producto(db.Model):
     descripcion = db.Column(db.String(2000), nullable=False)
     precio = db.Column(db.Float(10), nullable=False)
     cantidad = db.Column(db.Integer, nullable=False)
-   # etiqueta = db.relationship("Etiqueta", backref="producto")    
+    etiqueta_uno = db.Column(db.Enum(Etiqueta), nullable=False)
+    etiqueta_dos = db.Column(db.Enum(Etiqueta), nullable=True)
+    etiqueta_tres = db.Column(db.Enum(Etiqueta), nullable=True)
+   # etiqueta = db.relationship("Etiqueta", backref="producto") 
 
-    def __init__(self, titulo, foto, descripcion, precio, cantidad):
+
+    def __init__(self, titulo, foto, descripcion, precio, cantidad, etiqueta_uno, etiqueta_dos, etiqueta_tres):
         self.titulo = titulo
         self.foto = foto
         self.descripcion = descripcion
         self.precio = precio 
-        self.cantidad = cantidad     
+        self.cantidad = cantidad 
+        self.etiqueta_uno = etiqueta_uno
+        self.etiqueta_dos = etiqueta_dos
+        self.etiqueta_tres = etiqueta_tres    
 
     @classmethod
-    def nuevo(cls, titulo, foto, descripcion, precio, cantidad):
+    def nuevo(cls, titulo, foto, descripcion, precio, cantidad, etiqueta_uno, etiqueta_dos, etiqueta_tres):
         """
             normalizacion de nombre foto, etc...
             crea un objeto de la clase producto con
@@ -281,7 +298,10 @@ class Producto(db.Model):
             foto,
             descripcion,
             precio,
-            cantidad
+            cantidad,
+            etiqueta_uno,
+            etiqueta_dos,
+            etiqueta_tres
         )
         return nuevo_producto 
 
@@ -296,11 +316,18 @@ class Producto(db.Model):
         if "precio" in diccionario:
             self.precio = diccionario["precio"]
         if "cantidad" in diccionario:
-            self.cantidad = diccionario["cantidad"]            
+            self.cantidad = diccionario["cantidad"]   
+        if "etiqueta_uno" in diccionario:
+            self.etiqueta_uno = diccionario["etiqueta_uno"]  
+        if "etiqueta_dos" in diccionario:
+            self.etiqueta_dos = diccionario["etiqueta_dos"]  
+        if "etiqueta_tres" in diccionario:
+            self.etiqueta_tres = diccionario["etiqueta_tres"]                                               
         return True  
 
     def __repr__(self):
         return '<Producto %r>' % self.titulo
+        
     
     def serialize(self):
         return {
@@ -309,10 +336,13 @@ class Producto(db.Model):
             "foto": self.foto,
             "descripcion": self.descripcion,
             "precio": self.precio,
-            "cantidad": self.cantidad
+            "cantidad": self.cantidad,
+            "etiqueta_uno": self.etiqueta_uno.value,
+            "etiqueta_dos": self.etiqueta_dos.value,
+            "etiqueta_tres": self.etiqueta_tres.value    
+                  
            # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
         }       
-
 
 
 
