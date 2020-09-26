@@ -16,12 +16,12 @@ db = SQLAlchemy()
 ########################15
 #
 #    Usuarios
-#
+#sistemas@360gradosinmuebesynegocios.com
 ########################
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50), unique=False, nullable=False)
-    apellido = db.Column(db.String(50), unique=False, nullable=False)
+    nombre = db.Column(db.String(20), unique=False, nullable=False)
+    apellido = db.Column(db.String(20), unique=False, nullable=False)
     nombre_usuario = db.Column(db.String(20), unique=True, nullable=False)
     fecha_nacimiento = db.Column(db.Date())
     correo = db.Column(db.String(50), unique=True, nullable=False)

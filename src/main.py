@@ -1,7 +1,7 @@
 """
 Este modulo carga la Base de datos y agrega los endpoints
 """
-import os
+import os, re
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -67,6 +67,16 @@ def cr_usuario():
             return jsonify({
                 "resultado": "no envió la informacion para crear el usuario..."
             }), 400
+
+        # Verificamos correo
+        correo = dato_reg["correo"]
+        valcorreo = False
+        if re.match('^[(a-z0-9\_\-\.)]+@[(a-z0-9\_\-\.)]+\.[(a-z)]{2,15}$',correo.lower()):
+            print (f"Correo correcto: {correo}")
+            valcorreo = True
+        else:
+            print (f"Correo incorrecto: {correo}")
+            valcorreo = False
         #   verificar que el diccionario tenga los campos requeridos nombre, apellido, correo, telefono y clave
         if (
             "nombre" not in dato_reg or
@@ -84,8 +94,15 @@ def cr_usuario():
         if (
             dato_reg["nombre"] == "" or
             dato_reg["apellido"] == "" or
-            dato_reg["nombre_usuario"] == ""
-            #len(str(insumos_donante["cedula"])) > 14
+            dato_reg["nombre_usuario"] == "" or
+            valcorreo == False or
+            len(str(dato_reg["nombre"])) >= 20 or
+            len(str(dato_reg["apellido"])) >= 20 or
+            len(str(dato_reg["nombre_usuario"])) >= 20 or
+            len(str(dato_reg["correo"])) >= 50 or
+            len(str(dato_reg["telefono"])) >= 20 or
+            len(str(dato_reg["clave"])) >= 20 or
+            len(str(dato_reg["foto_perfil"])) >= 50
         ):
             return jsonify({
                 "resultado": "revise los valores de su solicitud"
@@ -178,23 +195,6 @@ def crud_usuario(id):
         return jsonify({
             "resultado": "el contacto que ingreso no existe..."
         }), 404
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -358,6 +358,7 @@ def actualizar_producto(producto_id):
 #    Envoar ccorreo o mensajes telegram
 #
 ########################
+
 
 #Para enviar correo usando la cuenta de VendeGram
 @app.route("/SendCorreo", methods = ['POST'])
