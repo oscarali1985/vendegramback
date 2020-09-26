@@ -234,7 +234,10 @@ def todos_productos():
         if (
             "titulo" not in insumos_producto or
             "descripcion" not in insumos_producto or
-            "foto" not in insumos_producto
+            "foto" not in insumos_producto or
+            "cantidad" not in insumos_producto or
+            "precio" not in insumos_producto or
+           "etiqueta_uno" not in insumos_producto
         ):
             return jsonify({
                 "resultado": "revise las propiedades de su solicitud"
@@ -244,6 +247,7 @@ def todos_productos():
             insumos_producto["titulo"] == "" or
             insumos_producto["descripcion"] == "" or
             insumos_producto["foto"] == "" or
+            insumos_producto["etiqueta_uno"] == "" or
             len(str(insumos_producto["titulo"])) > 100 or
             len(str(insumos_producto["descripcion"])) > 2000 or
             len(str(insumos_producto["foto"])) > 200 or
@@ -254,10 +258,12 @@ def todos_productos():
             return jsonify({
                 "resultado": "revise los valores de su solicitud"
             }), 400
-        
+
         # METODO POST: crear una variable y asignarle el nuevo producto con los datos validados
         body = request.get_json()        
-        producto = Producto(titulo=body['titulo'], foto=body['foto'], descripcion=body['descripcion'], precio=body['precio'], cantidad=body['cantidad'])
+        producto = Producto(titulo=body['titulo'], foto=body['foto'], descripcion=body['descripcion'],
+        precio=body['precio'], cantidad=body['cantidad'], etiqueta_uno=body['etiqueta_uno'], 
+        etiqueta_dos=body['etiqueta_dos'],etiqueta_tres=body['etiqueta_tres'])
         #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
         db.session.add(producto)
         try:
@@ -269,10 +275,8 @@ def todos_productos():
             print(f"{error.args} {type(error)}")
             # devolvemos "mira, tuvimos este error..."
             return jsonify({
-                "resultado": f"{error.args}"
+                "resultado1": f"{error.args}"
             }), 500
-
-
 
 ##########  4.- Eliminar un producto DELETE /producto/{producto_id} ########### 
 
@@ -328,6 +332,7 @@ def actualizar_producto(producto_id):
         return jsonify({
             "Presente error al actualizar un producto": f"{error.args}"
         }), 500    
+
 
 
 
