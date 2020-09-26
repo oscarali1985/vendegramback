@@ -282,9 +282,9 @@ class Producto(db.Model):
         self.descripcion = descripcion
         self.precio = precio 
         self.cantidad = cantidad 
-        self.etiqueta_uno = etiqueta_uno
-        self.etiqueta_dos = etiqueta_dos
-        self.etiqueta_tres = etiqueta_tres    
+        self.etiqueta_uno = Etiqueta(etiqueta_uno)
+        self.etiqueta_dos = Etiqueta(etiqueta_dos)
+        self.etiqueta_tres = Etiqueta(etiqueta_tres)    
 
     @classmethod
     def nuevo(cls, titulo, foto, descripcion, precio, cantidad, etiqueta_uno, etiqueta_dos, etiqueta_tres):
@@ -328,7 +328,7 @@ class Producto(db.Model):
     def __repr__(self):
         return '<Producto %r>' % self.titulo
         
-    
+
     def serialize(self):
         return {
             "id": self.id,
@@ -338,13 +338,10 @@ class Producto(db.Model):
             "precio": self.precio,
             "cantidad": self.cantidad,
             "etiqueta_uno": self.etiqueta_uno.value,
-            "etiqueta_dos": self.etiqueta_dos.value,
-            "etiqueta_tres": self.etiqueta_tres.value    
-                  
-           # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
-        }       
-
-
+            "etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",         
+            "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else ""
+            # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
+            }    
 
 
 

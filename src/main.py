@@ -356,8 +356,6 @@ def actualizar_producto(producto_id):
 
 
 
-
-
 ########################356
 #
 #    Envoar ccorreo o mensajes telegram
