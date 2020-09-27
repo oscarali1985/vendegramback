@@ -59,7 +59,10 @@ def todos_productos():
         if (
             "titulo" not in insumos_producto or
             "descripcion" not in insumos_producto or
-            "foto" not in insumos_producto
+            "foto" not in insumos_producto or
+            "cantidad" not in insumos_producto or
+            "precio" not in insumos_producto or
+           "etiqueta_uno" not in insumos_producto
         ):
             return jsonify({
                 "resultado": "revise las propiedades de su solicitud"
@@ -69,9 +72,10 @@ def todos_productos():
             insumos_producto["titulo"] == "" or
             insumos_producto["descripcion"] == "" or
             insumos_producto["foto"] == "" or
-            len(str(insumos_producto["titulo"])) > 2 or
-            len(str(insumos_producto["descripcion"])) > 2 or
-            len(str(insumos_producto["foto"])) > 2 or
+            insumos_producto["etiqueta_uno"] == "" or         
+            len(str(insumos_producto["titulo"])) > 100 or
+            len(str(insumos_producto["descripcion"])) > 2000 or
+            len(str(insumos_producto["foto"])) > 200 or
             int(insumos_producto["cantidad"]) < 0 or
             float(insumos_producto["precio"]) < 0
 
@@ -82,7 +86,9 @@ def todos_productos():
 
         # METODO POST: crear una variable y asignarle el nuevo producto con los datos validados
         body = request.get_json()        
-        producto = Producto(titulo=body['titulo'], foto=body['foto'], descripcion=body['descripcion'], precio=body['precio'], cantidad=body['cantidad'])
+        producto = Producto(titulo=body['titulo'], foto=body['foto'], descripcion=body['descripcion'],
+        precio=body['precio'], cantidad=body['cantidad'], etiqueta_uno=body['etiqueta_uno'], 
+        etiqueta_dos=body['etiqueta_dos'],etiqueta_tres=body['etiqueta_tres'])
         #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
         db.session.add(producto)
         try:
@@ -94,12 +100,12 @@ def todos_productos():
             print(f"{error.args} {type(error)}")
             # devolvemos "mira, tuvimos este error..."
             return jsonify({
-                "resultado": f"{error.args}"
+                "resultado1": f"{error.args}"
             }), 500
 
 ##########  4.- Eliminar un producto DELETE /producto/{producto_id} ########### 
 
-@app.route('/delete/<int:producto_id>', methods=['DELETE'])
+@app.route('/producto/<int:producto_id>', methods=['DELETE'])
 def eliminar_producto(producto_id):
     producto = Producto.query.get(producto_id)
     if producto is None:
@@ -140,6 +146,12 @@ def actualizar_producto(producto_id):
         producto.precio = body['precio']
     if "cantidad" in body:
         producto.cantidad = body['cantidad']
+    if "etiqueta_uno" in body:
+        producto.etiqueta_uno = body['etiqueta_uno']
+    if "etiqueta_dos" in body:
+        producto.etiqueta_dos = body['etiqueta_dos']
+    if "etiqueta_tres" in body:
+        producto.etiqueta_tres = body['etiqueta_tres']                        
     try:
         db.session.commit()
         # devolvemos el nuevo producto serializado y 200_CREATED

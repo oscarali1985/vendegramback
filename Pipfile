@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pylint = "*"
 
 [packages]
 flask = "*"
@@ -13,17 +14,17 @@ flask-migrate = "*"
 flask-swagger = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
-mysql-connector-python = "*"
+#mysql-connector-python = "*"
 flask-cors = "*"
 gunicorn = "*"
-mysqlclient = "*"
+mysqlclient = "1.4.6"
 flask-admin = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.8.5"
 
 [scripts]
-start="flask run -p 5001 -h 0.0.0.0"
+start="flask run -p 5000 -h 0.0.0.0"
 init="flask db init"
 migrate="flask db migrate"
 upgrade="flask db upgrade"

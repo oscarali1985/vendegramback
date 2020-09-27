@@ -12,5 +12,6 @@ def setup_admin(app):
     
     # Agrega tus modelos aqui, por ejemplo esto es como nosotros añadimos a un producto a el admin
     admin.add_view(ModelView(Producto, db.session))
+    #admin.add_view(ModelView(Etiqueta, db.session))
     # Pueden duplicar esta linea de abajo para agregar nuevos modelos
     # admin.add_view(ModelView(YourModelName, db.session))
