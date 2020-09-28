@@ -40,9 +40,6 @@ def generate_sitemap(app):
         <p>API HOST: <script>document.write('<input style="padding: 5px; width: 300px" type="text" value="'+window.location.href+'" />');</script></p>
         <p>Start working on your proyect by following the <a href="https://github.com/4GeeksAcademy/flask-rest-hello/blob/master/docs/_QUICK_START.md" target="_blank">Quick Start</a></p>
         <p>Remember to specify a real endpoint path like: </p>
-<<<<<<< HEAD
-        <ul style="text-align: left;">"""+links_html+"</ul></div>"
-=======
         <ul style="text-align: left;">"""+links_html+"</ul></div>"
 
 def validate_email_syntax(email):
@@ -53,4 +50,3 @@ def validate_email_syntax(email):
     else:
         # correo incorreco
         return False
->>>>>>> develop
