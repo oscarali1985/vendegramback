@@ -269,6 +269,8 @@ def todos_productos():
         precio=body['precio'], cantidad=body['cantidad'], etiqueta_uno=body['etiqueta_uno'], 
         etiqueta_dos=body['etiqueta_dos'],etiqueta_tres=body['etiqueta_tres'])
         #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
+        print("imprimiento")
+        print (jsonify(producto.serialize()))
         db.session.add(producto)
         try:
             db.session.commit()
