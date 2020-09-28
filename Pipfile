@@ -19,6 +19,8 @@ flask-cors = "*"
 gunicorn = "*"
 mysqlclient = "1.4.6"
 flask-admin = "*"
+requests = "*"
+mysql = "*"
 
 [requires]
 python_version = "3.8.5"
