@@ -325,14 +325,14 @@ class Producto(db.Model):
             self.precio = diccionario["precio"]
         if "cantidad" in diccionario:
             self.cantidad = diccionario["cantidad"]   
-        if "etiqueta_uno" in diccionario:
-            self.etiqueta_uno = diccionario["etiqueta_uno"]  
+        if "etiqueta_uno" in diccionario and diccionario["etiqueta_uno"] != "": 
+            self.etiqueta_uno = Etiqueta(diccionario["etiqueta_uno"])  
         if "etiqueta_dos" in diccionario:
-            self.etiqueta_dos = diccionario["etiqueta_dos"]  
+            self.etiqueta_dos = Etiqueta(diccionario["etiqueta_dos"]) if diccionario["etiqueta_dos"] else None
         if "etiqueta_tres" in diccionario:
-            self.etiqueta_tres = diccionario["etiqueta_tres"]                                               
+            self.etiqueta_tres = Etiqueta(diccionario["etiqueta_tres"]) if diccionario["etiqueta_tres"] else None                                               
         return True  
-
+#Etiqueta(etiqueta_tres) if etiqueta_tres else None 
     def __repr__(self):
         return '<Producto %r>' % self.titulo
         
