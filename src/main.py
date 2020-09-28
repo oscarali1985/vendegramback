@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
-from utils import APIException, generate_sitemap
+from utils import APIException, generate_sitemap, validate_email_syntax
 from admin import setup_admin
 from models import db, Usuario, Producto
 from smail import sendEmail
@@ -67,6 +67,7 @@ def cr_usuario():
             return jsonify({
                 "resultado": "no envió la informacion para crear el usuario..."
             }), 400
+
         #   verificar que el diccionario tenga los campos requeridos nombre, apellido, correo, telefono y clave
         if (
             "nombre" not in dato_reg or
@@ -80,16 +81,33 @@ def cr_usuario():
             return jsonify({
                 "resultado": "Favor verifique la informacion enviada faltan algunos campos obligatorios"
             }), 400
+<<<<<<< HEAD
         #   validar que campos no vengan vacíos y que cédula tenga menos de 14 caracteres
         if (
             dato_reg["nombre"] == "" or
             dato_reg["apellido"] == "" or
             dato_reg["nombre_usuario"] == ""
             #len(str(insumos_donante["cedula"])) > 14
+=======
+        #   validar que campos no vengan vacíos y que los campos cumplan con el modelo
+        if (
+            dato_reg["nombre"] == "" or
+            dato_reg["apellido"] == "" or
+            dato_reg["nombre_usuario"] == "" or
+            dato_reg["correo"] == "" or
+            len(str(dato_reg["nombre"])) >= 20 or
+            len(str(dato_reg["apellido"])) >= 20 or
+            len(str(dato_reg["nombre_usuario"])) >= 20 or
+            len(str(dato_reg["correo"])) >= 50 or
+            len(str(dato_reg["telefono"])) >= 20 or
+            len(str(dato_reg["clave"])) >= 20 or
+            len(str(dato_reg["foto_perfil"])) >= 50
+>>>>>>> develop
         ):
             return jsonify({
                 "resultado": "revise los valores de su solicitud"
             }), 400
+<<<<<<< HEAD
         #   crear una variable y asignarle el nuevo donante con los datos validados
         
         nuevo_usuario = Usuario.registrarse(
@@ -124,13 +142,68 @@ def cr_usuario():
             return jsonify({
                 "resultado": f"{error.args}"
             }), 500
+=======
+
+        # Se procede a validar el correo
+        validcorreo = validate_email_syntax(dato_reg["correo"])
+        print("Validando correo")
+        print(validcorreo)
+        if validcorreo == True:
+
+            #   crear una variable y asignarle el nuevo donante con los datos validados
+            nuevo_usuario = Usuario.registrarse(
+                dato_reg["nombre"].lower().capitalize(),
+                dato_reg["apellido"].lower().capitalize(),
+                dato_reg["nombre_usuario"],
+                dato_reg["fecha_nacimiento"],
+                dato_reg["correo"].casefold(),
+                dato_reg["telefono"],
+                dato_reg["clave"],
+                dato_reg["foto_perfil"],
+                dato_reg["administrador"],
+                dato_reg["suscripcion"]
+            )
+            
+            #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
+            db.session.add(nuevo_usuario)
+            try:
+                db.session.commit()
+                #titulocorreo= "Registro satisfactorio"
+                #nombre=dato_reg["nombre"]
+                #correo=dato_reg["correo"]
+                #nombreusuario=dato_reg["nombre_usuario"]
+                #mensaje = f"gracias por registrarse su usuario es {nombreusuario}"
+                #email = sendEmail(titulocorreo, nombre, correo, mensaje)
+                # devolvemos el nuevo donante serializado y 201_CREATED
+                return jsonify(nuevo_usuario.serializar()), 201
+            except Exception as error:
+                db.session.rollback()
+                print(f"{error.args} {type(error)}")
+                # devolvemos "mira, tuvimos este error..."
+                return jsonify({
+                    "resultado": f"{error.args}"
+                }), 500
+
+        else:
+            #Correo invalido
+            status_code = 400
+            response_body = {
+                "result": "HTTP_400_BAD_REQUEST. Verifique el correo ingresado."
+            }
+            return  jsonify(response_body), status_code
+
+>>>>>>> develop
 
 
 @app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
 def crud_usuario(id):
     """
         GET: devolver el detalle de un usuario específico
+<<<<<<< HEAD
         PATCH: actualizar datos del usuario específico,
+=======
+        PUT actualizar datos del usuario específico,
+>>>>>>> develop
             guardar en base de datos y devolver el detalle
         DELETE: eliminar el usuario específico y devolver 204 
     """
@@ -141,7 +214,11 @@ def crud_usuario(id):
         if request.method == "GET":
             # devolver el donante serializado y jsonificado. Y 200
             return jsonify(usuario.serializar()), 200
+<<<<<<< HEAD
         elif request.method == "PATCH":
+=======
+        elif request.method == "PUT":
+>>>>>>> develop
             # recuperar diccionario con insumos del body del request
             diccionario = request.get_json()
             # actualizar propiedades que vengan en el diccionario
@@ -181,6 +258,7 @@ def crud_usuario(id):
 
 
 
+<<<<<<< HEAD
 
 
 
@@ -198,6 +276,8 @@ def crud_usuario(id):
 
 
 
+=======
+>>>>>>> develop
 ########################201
 #
 #    Productos
@@ -269,6 +349,11 @@ def todos_productos():
         precio=body['precio'], cantidad=body['cantidad'], etiqueta_uno=body['etiqueta_uno'], 
         etiqueta_dos=body['etiqueta_dos'],etiqueta_tres=body['etiqueta_tres'])
         #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
+<<<<<<< HEAD
+=======
+        print("imprimiento")
+        print (jsonify(producto.serialize()))
+>>>>>>> develop
         db.session.add(producto)
         try:
             db.session.commit()
@@ -367,6 +452,10 @@ def actualizar_producto(producto_id):
 #
 ########################
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
 #Para enviar correo usando la cuenta de VendeGram
 @app.route("/SendCorreo", methods = ['POST'])
 def SendCorreo():
@@ -408,6 +497,7 @@ def SendTelegram():
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
+<<<<<<< HEAD
     app.run(host='0.0.0.0', port=PORT, debug=False)
 
 
@@ -591,3 +681,6 @@ def actualizar_producto(producto_id):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=False)"""
+=======
+    app.run(host='0.0.0.0', port=PORT, debug=False)
+>>>>>>> develop
