@@ -283,8 +283,8 @@ class Producto(db.Model):
         self.precio = precio 
         self.cantidad = cantidad 
         self.etiqueta_uno = Etiqueta(etiqueta_uno)
-        self.etiqueta_dos = Etiqueta(etiqueta_dos)
-        self.etiqueta_tres = Etiqueta(etiqueta_tres)    
+        self.etiqueta_dos = Etiqueta(etiqueta_dos) if etiqueta_dos else None
+        self.etiqueta_tres = Etiqueta(etiqueta_tres) if etiqueta_tres else None   
 
     @classmethod
     def nuevo(cls, titulo, foto, descripcion, precio, cantidad, etiqueta_uno, etiqueta_dos, etiqueta_tres):
@@ -343,7 +343,8 @@ class Producto(db.Model):
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
             }    
 
-
+#"etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",
+                
 
 
 
