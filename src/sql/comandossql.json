@@ -16,10 +16,12 @@
 //Insertar Producto
 
 {
-    "titulo": "Prueba 2",	
-         "foto": "uno",
-         "descripcion": "TEST",
-     "cantidad": 5,
-     "precio": 20.0
-  
-   }
+    "cantidad": 3,
+    "descripcion": "delicioso",
+    "etiqueta_dos": "alimentos",
+    "etiqueta_tres": "refrescos",
+    "etiqueta_uno": "",
+    "foto": "foto",
+    "precio": 15.0,
+    "titulo": "chocolate"
+}
