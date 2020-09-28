@@ -1,12 +1,12 @@
 """
 Este modulo carga la Base de datos y agrega los endpoints
 """
-import os, re
+import os
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
-from utils import APIException, generate_sitemap
+from utils import APIException, generate_sitemap, validate_email_syntax
 from admin import setup_admin
 from models import db, Usuario, Producto
 from smail import sendEmail
@@ -68,15 +68,6 @@ def cr_usuario():
                 "resultado": "no envió la informacion para crear el usuario..."
             }), 400
 
-        # Verificamos correo
-        correo = dato_reg["correo"]
-        valcorreo = False
-        if re.match('^[(a-z0-9\_\-\.)]+@[(a-z0-9\_\-\.)]+\.[(a-z)]{2,15}$',correo.lower()):
-            print (f"Correo correcto: {correo}")
-            valcorreo = True
-        else:
-            print (f"Correo incorrecto: {correo}")
-            valcorreo = False
         #   verificar que el diccionario tenga los campos requeridos nombre, apellido, correo, telefono y clave
         if (
             "nombre" not in dato_reg or
@@ -90,12 +81,12 @@ def cr_usuario():
             return jsonify({
                 "resultado": "Favor verifique la informacion enviada faltan algunos campos obligatorios"
             }), 400
-        #   validar que campos no vengan vacíos y que cédula tenga menos de 14 caracteres
+        #   validar que campos no vengan vacíos y que los campos cumplan con el modelo
         if (
             dato_reg["nombre"] == "" or
             dato_reg["apellido"] == "" or
             dato_reg["nombre_usuario"] == "" or
-            valcorreo == False or
+            dato_reg["correo"] == "" or
             len(str(dato_reg["nombre"])) >= 20 or
             len(str(dato_reg["apellido"])) >= 20 or
             len(str(dato_reg["nombre_usuario"])) >= 20 or
@@ -107,47 +98,62 @@ def cr_usuario():
             return jsonify({
                 "resultado": "revise los valores de su solicitud"
             }), 400
-        #   crear una variable y asignarle el nuevo donante con los datos validados
-        
-        nuevo_usuario = Usuario.registrarse(
-            dato_reg["nombre"].lower().capitalize(),
-            dato_reg["apellido"].lower().capitalize(),
-            dato_reg["nombre_usuario"],
-            dato_reg["fecha_nacimiento"],
-            dato_reg["correo"].casefold(),
-            dato_reg["telefono"],
-            dato_reg["clave"],
-            dato_reg["foto_perfil"],
-            dato_reg["administrador"],
-            dato_reg["suscripcion"]
-        )
-        
-        #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
-        db.session.add(nuevo_usuario)
-        try:
-            db.session.commit()
-            #titulocorreo= "Registro satisfactorio"
-            #nombre=dato_reg["nombre"]
-            #correo=dato_reg["correo"]
-            #nombreusuario=dato_reg["nombre_usuario"]
-            #mensaje = f"gracias por registrarse su usuario es {nombreusuario}"
-            #email = sendEmail(titulocorreo, nombre, correo, mensaje)
-            # devolvemos el nuevo donante serializado y 201_CREATED
-            return jsonify(nuevo_usuario.serializar()), 201
-        except Exception as error:
-            db.session.rollback()
-            print(f"{error.args} {type(error)}")
-            # devolvemos "mira, tuvimos este error..."
-            return jsonify({
-                "resultado": f"{error.args}"
-            }), 500
+
+        # Se procede a validar el correo
+        validcorreo = validate_email_syntax(dato_reg["correo"])
+        print("Validando correo")
+        print(validcorreo)
+        if validcorreo == True:
+
+            #   crear una variable y asignarle el nuevo donante con los datos validados
+            nuevo_usuario = Usuario.registrarse(
+                dato_reg["nombre"].lower().capitalize(),
+                dato_reg["apellido"].lower().capitalize(),
+                dato_reg["nombre_usuario"],
+                dato_reg["fecha_nacimiento"],
+                dato_reg["correo"].casefold(),
+                dato_reg["telefono"],
+                dato_reg["clave"],
+                dato_reg["foto_perfil"],
+                dato_reg["administrador"],
+                dato_reg["suscripcion"]
+            )
+            
+            #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
+            db.session.add(nuevo_usuario)
+            try:
+                db.session.commit()
+                #titulocorreo= "Registro satisfactorio"
+                #nombre=dato_reg["nombre"]
+                #correo=dato_reg["correo"]
+                #nombreusuario=dato_reg["nombre_usuario"]
+                #mensaje = f"gracias por registrarse su usuario es {nombreusuario}"
+                #email = sendEmail(titulocorreo, nombre, correo, mensaje)
+                # devolvemos el nuevo donante serializado y 201_CREATED
+                return jsonify(nuevo_usuario.serializar()), 201
+            except Exception as error:
+                db.session.rollback()
+                print(f"{error.args} {type(error)}")
+                # devolvemos "mira, tuvimos este error..."
+                return jsonify({
+                    "resultado": f"{error.args}"
+                }), 500
+
+        else:
+            #Correo invalido
+            status_code = 400
+            response_body = {
+                "result": "HTTP_400_BAD_REQUEST. Verifique el correo ingresado."
+            }
+            return  jsonify(response_body), status_code
+
 
 
 @app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
 def crud_usuario(id):
     """
         GET: devolver el detalle de un usuario específico
-        PATCH: actualizar datos del usuario específico,
+        PUT actualizar datos del usuario específico,
             guardar en base de datos y devolver el detalle
         DELETE: eliminar el usuario específico y devolver 204 
     """
@@ -158,7 +164,7 @@ def crud_usuario(id):
         if request.method == "GET":
             # devolver el donante serializado y jsonificado. Y 200
             return jsonify(usuario.serializar()), 200
-        elif request.method == "PATCH":
+        elif request.method == "PUT":
             # recuperar diccionario con insumos del body del request
             diccionario = request.get_json()
             # actualizar propiedades que vengan en el diccionario
