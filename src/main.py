@@ -209,6 +209,10 @@ def crud_usuario(id):
 #####  1.-Obtenga una lista de todos los productos GET /producto;                         tambien filtra por nombre si recibe el parametro en la url   #########
     ##########  2.- Crear un nuevo producto POST /producto ########### 
 
+###################        CRUD de Vendegram !!!    ######################  
+#####  1.-Obtenga una lista de todos los productos GET /producto;                         tambien filtra por nombre si recibe el parametro en la url   #########
+    ##########  2.- Crear un nuevo producto POST /producto ########### 
+
 @app.route('/producto', methods=["GET", "POST"])
 
 def todos_productos():
@@ -247,7 +251,7 @@ def todos_productos():
             insumos_producto["titulo"] == "" or
             insumos_producto["descripcion"] == "" or
             insumos_producto["foto"] == "" or
-            insumos_producto["etiqueta_uno"] == "" or
+            insumos_producto["etiqueta_uno"] == "" or         
             len(str(insumos_producto["titulo"])) > 100 or
             len(str(insumos_producto["descripcion"])) > 2000 or
             len(str(insumos_producto["foto"])) > 200 or
@@ -265,6 +269,8 @@ def todos_productos():
         precio=body['precio'], cantidad=body['cantidad'], etiqueta_uno=body['etiqueta_uno'], 
         etiqueta_dos=body['etiqueta_dos'],etiqueta_tres=body['etiqueta_tres'])
         #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
+        print("imprimiento")
+        print (jsonify(producto.serialize()))
         db.session.add(producto)
         try:
             db.session.commit()
@@ -321,6 +327,12 @@ def actualizar_producto(producto_id):
         producto.precio = body['precio']
     if "cantidad" in body:
         producto.cantidad = body['cantidad']
+    if "etiqueta_uno" in body:
+        producto.etiqueta_uno = body['etiqueta_uno']
+    if "etiqueta_dos" in body:
+        producto.etiqueta_dos = body['etiqueta_dos']
+    if "etiqueta_tres" in body:
+        producto.etiqueta_tres = body['etiqueta_tres']                        
     try:
         db.session.commit()
         # devolvemos el nuevo producto serializado y 200_CREATED
@@ -332,13 +344,6 @@ def actualizar_producto(producto_id):
         return jsonify({
             "Presente error al actualizar un producto": f"{error.args}"
         }), 500    
-
-
-
-
-
-
-
 
 
 
