@@ -11,27 +11,27 @@ from admin import setup_admin
 from models import db, Usuario, Producto
 from smail import sendEmail
 from stele import sendTelegram
-
-
+from flask_jwt_simple import (
+    JWTManager, jwt_required, create_jwt, get_jwt_identity
+)
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 MIGRATE = Migrate(app, db)
 db.init_app(app)
+jwt = JWTManager(app)
 CORS(app)
 setup_admin(app)
-
-# Maneja/sereliza errores como un objeto JSON
+# Maneja/sereliza errores como un objeto JSON 26
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
-
 # Genera el sitio con todos los endpoints cargados
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
-
 ########################35
 #
 #    Usuarios
@@ -41,9 +41,10 @@ def sitemap():
 @app.route("/usuario", methods=["GET", "POST"])
 def cr_usuario():
     """
-        "GET": devolver lista de todos los donantes
-        "POST": crear un donante y devolver su información
+        "GET": devolver lista de todos los usuarios
+        "POST": crear un usuario y devolver su información
     """
+
     # averiguar si es GET o POST
     if request.method == "GET":
         #   seleccionar todos los registros de la tabla donantes - usando flask-sqlalchemy
@@ -60,6 +61,7 @@ def cr_usuario():
         print(usuarios_serializados)
         #   devolver la lista jsonificada y 200_OK
         return jsonify(usuarios_serializados), 200
+        
     else:
         #   crear una variable y asignarle diccionario con datos para crear donante
         dato_reg = request.json # request.get_json()
@@ -138,7 +140,6 @@ def cr_usuario():
                 return jsonify({
                     "resultado": f"{error.args}"
                 }), 500
-
         else:
             #Correo invalido
             status_code = 400
@@ -150,6 +151,7 @@ def cr_usuario():
 
 
 @app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
+@jwt_required
 def crud_usuario(id):
     """
         GET: devolver el detalle de un usuario específico
@@ -208,10 +210,10 @@ def crud_usuario(id):
 #
 #    Productos
 #
-########################
+######################## 211
 
 
-###################        CRUD de Vendegram !!!    ######################  
+###################        CRUD de Vendegram !!!    ######################  214
 #####  1.-Obtenga una lista de todos los productos GET /producto;                         tambien filtra por nombre si recibe el parametro en la url   #########
     ##########  2.- Crear un nuevo producto POST /producto ########### 
 
@@ -411,6 +413,52 @@ def SendTelegram():
         response = sendTelegram(nombre, telegram, mensaje)
         
         return response
+
+
+########################416
+#
+#    Login
+#
+########################
+
+@app.route("/ingresar", methods = ['POST'])
+def manejar_ingreso():
+    '''
+    POST: Se verifica si el usuario existe y luego se verifica la clave. Se recibe el correo y clave
+    '''
+
+    input_data = request.json
+    if ("nombre_usuario" not in input_data or
+        "clave" not in input_data 
+    ):
+        return jsonify({
+            "resultado":"favor ingresar la el usuario o clave para verificar la informacion"
+            }),400
+
+    else:
+        usuario = Usuario.query.filter_by(
+            nombre_usuario=input_data["nombre_usuario"]
+        ).one_or_none()
+        if usuario is None:
+            return jsonify({
+            "resultado":"La informacion ingresada es incorrecta valide sus datos"
+            }), 400
+        else:
+            if usuario.check_password(input_data["clave"]):
+                #exito
+                token = create_jwt(identity = usuario.id)
+                return jsonify({
+                    "token": token,
+                    "correo":usuario.correo,
+                    "isadmin":usuario.administrador
+                }), 200
+
+            else:
+                return jsonify({
+            "resultado":"Verifique su clave"
+            }), 400
+
+
 
 
 

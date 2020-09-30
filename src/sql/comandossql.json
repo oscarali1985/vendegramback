@@ -19,9 +19,15 @@
     "cantidad": 3,
     "descripcion": "delicioso",
     "etiqueta_dos": "alimentos",
-    "etiqueta_tres": "refrescos",
-    "etiqueta_uno": "",
+    "etiqueta_tres": "",
+    "etiqueta_uno": "refrescos",
     "foto": "foto",
     "precio": 15.0,
     "titulo": "chocolate"
 }
+
+
+// >>> import os
+// >>> from base64 import b64encode
+// >>> b64encode(os.urandom(32)).decode("utf-8")
+

@@ -2,11 +2,12 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timezone
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime, Float
 import enum
+import json, os
+from base64 import b64encode
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
-
-
-# Mas importaciones
+# Mas importacionesfrom 
 
 
 
@@ -27,12 +28,13 @@ class Usuario(db.Model):
     fecha_nacimiento = db.Column(db.Date())
     correo = db.Column(db.String(50), unique=True, nullable=False)
     telefono= db.Column(db.String(20), unique=False, nullable=False)
-    clave_hash = db.Column(db.String(50), unique=False, nullable=False)
+    clave_hash = db.Column(db.String(250), nullable=False)
+    salt = db.Column(db.String(16), nullable=False)
     foto_perfil = db.Column(db.String(50), unique=False, nullable=True)
     administrador = db.Column(db.Boolean(), unique=False, nullable=False)
     suscripcion = db.Column(db.Integer, unique=False, nullable=True)
 
-    def __init__(self, nombre, apellido, nombre_usuario, fecha_nacimiento, correo, telefono, clave_hash, foto_perfil, administrador, suscripcion):
+    def __init__(self, nombre, apellido, nombre_usuario, fecha_nacimiento, correo, telefono, clave, foto_perfil, administrador, suscripcion):
         """ crea y devuelve una instancia de esta clase """
         self.nombre = nombre
         self.apellido = apellido
@@ -40,10 +42,23 @@ class Usuario(db.Model):
         self.fecha_nacimiento = fecha_nacimiento
         self.correo = correo
         self.telefono = telefono
-        self.clave_hash = clave_hash
+        self.salt = b64encode(os.urandom(4)).decode("utf-8")
+        self.set_password(clave)
         self.foto_perfil = foto_perfil
         self.administrador = administrador
         self.suscripcion = suscripcion
+
+
+    def set_password(self, clave):
+
+        """
+        hash y guarda
+        """
+        self.clave_hash = generate_password_hash(f"{clave}{self.salt}")
+
+    def check_password(self, clave):
+        """ Se verifica si clave coincide """
+        return check_password_hash(self.clave_hash, f"{clave}{self.salt}")
 
     def __str__(self):
         return f"\t{self.id} ->  {self.nombre_completo}"
