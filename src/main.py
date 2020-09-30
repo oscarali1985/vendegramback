@@ -47,8 +47,8 @@ def cr_usuario():
 
     # averiguar si es GET o POST
     if request.method == "GET":
-        #   seleccionar todos los registros de la tabla donantes - usando flask-sqlalchemy
-        #   crear una variable lista y asignarle todos los donantes que devuelva la consulta
+        #   seleccionar todos los registros de la tabla usuarios usuarios - usando flask-sqlalchemy
+        #   crear una variable lista y asignarle todos los usuarios que devuelva la consulta
         usuarios = Usuario.query.all()
         # verificamos si hay parámetros en la url y filtramos la lista con eso
         nombre = request.args.get("nombre")
@@ -150,6 +150,7 @@ def cr_usuario():
 #Obtiene usuarios segun su id para acualizar o eliminar solo por admin
 @app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
 @jwt_required
+
 def crud_usuario(id):
     """
         GET: devolver el detalle de un usuario específico
@@ -157,6 +158,12 @@ def crud_usuario(id):
             guardar en base de datos y devolver el detalle
         DELETE: eliminar el usuario específico y devolver 204 
     """
+    usuario_id_jwt = get_jwt_identity()
+    usuario= Usuario.query.get(usuario_id_jwt)
+    admin = usuario.administrador
+    print(usuario_id_jwt)
+    print(usuario)
+    print(admin)
     # crear una variable y asignar el donante específico
     usuario = Usuario.query.get(id)
     # verificar si el donante con id donante_id existe
@@ -418,7 +425,7 @@ def manejar_ingreso():
 
     else:
         usuario = Usuario.query.filter_by(
-            nombre_usuario=input_data["nombre_usuario"]
+            correo=input_data["nombre_usuario"]
         ).one_or_none()
         if usuario is None:
             return jsonify({
