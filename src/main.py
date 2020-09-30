@@ -416,7 +416,7 @@ def manejar_ingreso():
     '''
 
     input_data = request.json
-    if ("nombre_usuario" not in input_data or
+    if ("correo" not in input_data or
         "clave" not in input_data 
     ):
         return jsonify({
@@ -425,7 +425,7 @@ def manejar_ingreso():
 
     else:
         usuario = Usuario.query.filter_by(
-            correo=input_data["nombre_usuario"]
+            correo=input_data["correo"]
         ).one_or_none()
         if usuario is None:
             return jsonify({
@@ -437,6 +437,7 @@ def manejar_ingreso():
                 token = create_jwt(identity = usuario.id)
                 return jsonify({
                     "token": token,
+                    "id_usuario": usuario.id,
                     "correo":usuario.correo,
                     "isadmin":usuario.administrador
                 }), 200
