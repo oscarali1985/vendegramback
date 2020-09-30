@@ -148,8 +148,7 @@ def cr_usuario():
             }
             return  jsonify(response_body), status_code
 
-
-
+#Obtiene usuarios segun su id para acualizar o eliminar solo por admin
 @app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
 @jwt_required
 def crud_usuario(id):

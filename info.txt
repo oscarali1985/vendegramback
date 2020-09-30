@@ -1,7 +1,13 @@
 
+@jwt_required
+
 usuario_id_jwt = get_jwt_identity()
 usuario= Usuario.query.get(usuario_id_jwt)
 
 // return jsonify({
 //     "resultado": f"{usuario.correo}{usuario.administrador}{usuario.nombre}"
 // }), 201
+
+Enpoint seguros
+@app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
+
