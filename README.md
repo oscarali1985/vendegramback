@@ -14,7 +14,7 @@
 - SQLAlchemy integration for database abstraction.
 
 ## Installation (automatic if you are using gitpod)
-
+mysqlclient = "*"
 > Important: The boiplerplate is made for python 3.7 but you can easily change the `python_version` on the Pipfile.
 
 The following steps are automatically runned withing gitpod, if you are doing a local installation you have to do them manually:

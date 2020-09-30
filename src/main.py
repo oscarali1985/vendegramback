@@ -69,7 +69,6 @@ def cr_usuario():
             return jsonify({
                 "resultado": "no envió la informacion para crear el usuario..."
             }), 400
-
         #   verificar que el diccionario tenga los campos requeridos nombre, apellido, correo, telefono y clave
         if (
             "nombre" not in dato_reg or
@@ -322,24 +321,8 @@ def actualizar_producto(producto_id):
     body = request.get_json()
     producto = Producto.query.get(producto_id)
     if producto is None:
-        raise APIException('producto no encontrado', status_code=404)
-
-    if "titulo" in body:
-        producto.titulo = body["titulo"]
-    if "foto" in body:
-        producto.foto = body["foto"]
-    if "descripcion" in body:
-        producto.descripcion = body['descripcion']
-    if "precio" in body:
-        producto.precio = body['precio']
-    if "cantidad" in body:
-        producto.cantidad = body['cantidad']
-    if "etiqueta_uno" in body:
-        producto.etiqueta_uno = body['etiqueta_uno']
-    if "etiqueta_dos" in body:
-        producto.etiqueta_dos = body['etiqueta_dos']
-    if "etiqueta_tres" in body:
-        producto.etiqueta_tres = body['etiqueta_tres']                        
+        raise APIException('producto no encontrado', status_code=404) 
+    producto.update(body)
     try:
         db.session.commit()
         # devolvemos el nuevo producto serializado y 200_CREATED
@@ -375,7 +358,6 @@ def actualizar_producto(producto_id):
 #    Envoar ccorreo o mensajes telegram
 #
 ########################
-
 
 #Para enviar correo usando la cuenta de VendeGram
 @app.route("/SendCorreo", methods = ['POST'])
