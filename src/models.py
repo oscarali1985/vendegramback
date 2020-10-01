@@ -203,56 +203,147 @@ class Usuario(db.Model):
 #
 ########################
 
+class Zona_general(enum.Enum):
+    DISTRITO_CAPITAL = "Distrito Capital"
+    MIRANDA = "Miranda"
+
+class Zona(enum.Enum):   
+  
+    ALTAGRACIA = "Altagracia"
+    ANTÍMANO = "Antimano"
+    CANDELARIA = "Candelaria"
+    CARICUAO = "Caricuao"
+    CATEDRAL = "Catedral"
+    CATIA = "Catia"
+    CAUCAGÜITA = "Caucagüita"
+    CHACAO = "Chacao"
+    COCHE = "Coche"
+    EL_CAFETAL = "El Cafetal"
+    EL_JUNQUITO = "El Junquito"
+    EL_PARAÍSO = "El Paraíso"
+    EL_RECREO = "El Recreo"
+    EL_VALLE = "El Valle"
+    FILA_DE_MARICHES = "Fila De Mariches"
+    LA_DOLORITA = "La Dolorita"
+    LA_PASTORA = "La Pastora"
+    LA_VEGA = "La Vega"
+    LAS_MINAS = "Las Minas"
+    LEONCIO_MARTÍNEZ = "Leoncio Martínez"
+    MACARAO = "Macarao"
+    NUESTRA_SEÑORA_DEL_ROSARIO = "Nuestra Señora Del Rosario"
+    PETARE = "Petare"
+    SAN_AGUSTÍN = "San Agustín"
+    SAN_BERNARDINO = "San Bernardino"
+    SAN_JOSÉ = "San José"
+    SAN_JUAN = "San Juan"
+    SAN_PEDRO = "San Pedro"
+    SANTA_ROSALÍA = "Santa Rosalía"
+    SANTA_ROSALÍA_DE_PALERMO = "Santa Rosalía De Palermo"
+    SANTA_TERESA = "Santa Teresa"
+    VEINTITRÉS_DE_ENERO = "veintitrés De Enero"  
+
+   
+class Tienda(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre_tienda = db.Column(db.String(40), unique=True, nullable=False)
+    correo_tienda = db.Column(db.String(30), unique=True, nullable=False)
+    telefono_tienda = db.Column(db.Integer, nullable=True)
+    foto_tienda = db.Column(db.String(200), nullable=True)
+    facebook_tienda = db.Column(db.String(30), nullable=True)
+    instagram_tienda = db.Column(db.String(30), nullable=True)
+    twitter_tienda = db.Column(db.String(30), nullable=True)
+    zona_general = db.Column(db.Enum(Zona_general), nullable=False)
+    zona_uno = db.Column(db.Enum(Zona), nullable=True)
+    zona_dos = db.Column(db.Enum(Zona), nullable=True)
+    zona_tres = db.Column(db.Enum(Zona), nullable=True) 
+    productos = db.relationship("Producto", backref="tienda") 
 
 
+    def __init__(self, nombre_tienda, correo_tienda, telefono_tienda, foto_tienda, facebook_tienda, 
+    instagram_tienda, twitter_tienda, zona_general, zona_uno, zona_dos, zona_tres):
+        self.nombre_tienda = nombre_tienda
+        self.correo_tienda = correo_tienda
+        self.telefono_tienda = telefono_tienda
+        self.foto_tienda = foto_tienda 
+        self.facebook_tienda = facebook_tienda 
+        self.instagram_tienda = instagram_tienda
+        self.twitter_tienda = twitter_tienda
+        self.zona_general = Zona_general(zona_general)
+        self.zona_uno = Zona(zona_uno) if zona_uno else None
+        self.zona_dos = Zona(zona_dos) if zona_dos else None
+        self.zona_tres = Zona(zona_tres) if zona_tres else None 
 
+    @classmethod
+    def nuevo(cls, nombre_tienda, correo_tienda, telefono_tienda, foto_tienda, facebook_tienda, 
+    instagram_tienda, twitter_tienda, zona_general, zona_uno, zona_dos, zona_tres):
 
+        """
+            normalizacion de nombre foto, etc...
+            crea un objeto de la clase tienda con
+            esa normalizacion y devuelve la instancia creada.
+        """
+        nuevo_tienda = cls(
+            nombre_tienda,
+            correo_tienda,
+            telefono_tienda,
+            foto_tienda,
+            facebook_tienda,
+            instagram_tienda,
+            twitter_tienda,
+            zona_general,
+            zona_uno,
+            zona_dos,
+            zona_tres
+        )
+        return nuevo_tienda 
 
+    def update(self, diccionario):
+        """Actualizacion de producto"""
+        if "nombre_tienda" in diccionario:
+            self.nombre_tienda = diccionario["nombre_tienda"]
+        if "correo_tienda" in diccionario:
+            self.correo_tienda = diccionario["correo_tienda"]
+        if "telefono_tienda" in diccionario:
+            self.telefono_tienda = diccionario["telefono_tienda"]
+        if "foto_tienda" in diccionario:
+            self.foto_tienda = diccionario["foto_tienda"]
+        if "facebook_tienda" in diccionario:
+            self.facebook_tienda = diccionario["facebook_tienda"]   
+        if "instagram_tienda" in diccionario:
+            self.instagram_tienda = diccionario["instagram_tienda"] 
+        if "twitter_tienda" in diccionario:
+            self.twitter_tienda = diccionario["twitter_tienda"] 
+        if "zona_general" in diccionario and diccionario ["zona_general"] != "":
+            self.zona_general = Zona_general(diccionario["zona_general"])
+        if "zona_uno" in diccionario:
+            self.zona_uno = Zona(diccionario["zona_uno"]) if diccionario["zona_uno"] else None
+        if "zona_dos" in diccionario:
+            self.zona_dos = Zona(diccionario["zona_dos"]) if diccionario["zona_dos"] else None
+        if "zona_tres" in diccionario:
+            self.zona_tres = Zona(diccionario["zona_tres"]) if diccionario["zona_tres"] else None                                                                                
+        return True  
+ 
+    def __repr__(self):
+        return '<Tienda %r>' % self.nombre_tienda
+        
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-########################
-#
-#    ZONA
-#
-########################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre_tienda": self.nombre_tienda,
+            "correo_tienda": self.correo_tienda,
+            "telefono_tienda": self.telefono_tienda,
+            "foto_tienda": self.foto_tienda,
+            "facebook_tienda": self.facebook_tienda,
+            "instagram_tienda": self.instagram_tienda,
+            "twitter_tienda": self.twitter_tienda,
+            "zona_general": self.zona_general.value,
+            "zona_uno": self.zona_uno.value if self.zona_uno else "",
+            "zona_dos": self.zona_dos.value if self.zona_dos else "",
+            "zona_tres": self.zona_tres.value if self.zona_tres else ""
+            # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
+            }    
+             
 
 
 ########################136
@@ -261,41 +352,55 @@ class Usuario(db.Model):
 #
 ########################
 
+class Etiqueta_general(enum.Enum):
+    PRODUCTOS = "productos"
+    SERVICIOS = "servicios"
 
 class Etiqueta(enum.Enum):   
     ALIMENTOS = "alimentos"
     BEBIDAS = "bebidas"
-    SALSAS = "salsas"
-    ENLATADOS = "enlatados"
-    REFRESCOS = "refrescos"
-    JUGOS = "jugos"
     CEREALES = "cereales"
-
+    DECORACIONES = "decoraciones"
+    DETERGENTES = "detergentes"
+    ENLATADOS = "enlatados"
+    JABONES = "jabones"
+    MANTENIMIENTOS = "mantenimientos"
+    MAQUILLAJES = "maquillajes"
+    MEDICAMENTOS = "medicamentos"
+    PELUQUERIA = "peluqueria"
+    PELUQUERIA_VETERINARIA = "peliqueria_veterinaria"
+    PLOMERIA = "plomeria"
+    REPARACIONES = "reparaciones"
+    ROPA = "ropa"
+    SALSAS = "salsas"
+   
 class Producto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    titulo = db.Column(db.String(100), nullable=False)
+    titulo = db.Column(db.String(100), unique=True, nullable=False)
     foto = db.Column(db.String(200), nullable=False)
     descripcion = db.Column(db.String(2000), nullable=False)
     precio = db.Column(db.Float(10), nullable=False)
     cantidad = db.Column(db.Integer, nullable=False)
+    etiqueta_general = db.Column(db.Enum(Etiqueta_general), nullable=False)
     etiqueta_uno = db.Column(db.Enum(Etiqueta), nullable=False)
     etiqueta_dos = db.Column(db.Enum(Etiqueta), nullable=True)
     etiqueta_tres = db.Column(db.Enum(Etiqueta), nullable=True)
-   # etiqueta = db.relationship("Etiqueta", backref="producto") 
+    tienda_id = db.Column(db.Integer, ForeignKey('tienda.id'))
 
 
-    def __init__(self, titulo, foto, descripcion, precio, cantidad, etiqueta_uno, etiqueta_dos, etiqueta_tres):
+    def __init__(self, titulo, foto, descripcion, precio, cantidad, etiqueta_general, etiqueta_uno, etiqueta_dos, etiqueta_tres):
         self.titulo = titulo
         self.foto = foto
         self.descripcion = descripcion
         self.precio = precio 
         self.cantidad = cantidad 
+        self.etiqueta_general = Etiqueta_general(etiqueta_general)
         self.etiqueta_uno = Etiqueta(etiqueta_uno)
         self.etiqueta_dos = Etiqueta(etiqueta_dos) if etiqueta_dos else None
         self.etiqueta_tres = Etiqueta(etiqueta_tres) if etiqueta_tres else None   
 
     @classmethod
-    def nuevo(cls, titulo, foto, descripcion, precio, cantidad, etiqueta_uno, etiqueta_dos, etiqueta_tres):
+    def nuevo(cls, titulo, foto, descripcion, precio, cantidad, etiqueta_general, etiqueta_uno, etiqueta_dos, etiqueta_tres):
         """
             normalizacion de nombre foto, etc...
             crea un objeto de la clase producto con
@@ -307,6 +412,7 @@ class Producto(db.Model):
             descripcion,
             precio,
             cantidad,
+            etiqueta_general,
             etiqueta_uno,
             etiqueta_dos,
             etiqueta_tres
@@ -325,6 +431,8 @@ class Producto(db.Model):
             self.precio = diccionario["precio"]
         if "cantidad" in diccionario:
             self.cantidad = diccionario["cantidad"]   
+        if "etiqueta_general" in diccionario and diccionario["etiqueta_general"] != "": 
+            self.etiqueta_general = Etiqueta_general(diccionario["etiqueta_general"])  
         if "etiqueta_uno" in diccionario and diccionario["etiqueta_uno"] != "": 
             self.etiqueta_uno = Etiqueta(diccionario["etiqueta_uno"])  
         if "etiqueta_dos" in diccionario:
@@ -345,6 +453,7 @@ class Producto(db.Model):
             "descripcion": self.descripcion,
             "precio": self.precio,
             "cantidad": self.cantidad,
+            "etiqueta_general": self.etiqueta_general.value,
             "etiqueta_uno": self.etiqueta_uno.value,
             "etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",         
             "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else ""
@@ -353,53 +462,6 @@ class Producto(db.Model):
 
 #"etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",
                 
-
-
-
-
-
-
-########################
-#
-#    Etiqueta
-#
-########################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
