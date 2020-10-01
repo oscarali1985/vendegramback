@@ -1,19 +1,15 @@
 para probar en postman o similares crear el encabezado
 Authorization Bearer token
 
-
 @jwt_required  Se escribe despues del enpoint y antes del def
-
 
 usuario_id_jwt = get_jwt_identity()
 usuario= Usuario.query.get(usuario_id_jwt)
 
-se escribe luego del del usuario.administrador
 
 // return jsonify({
 //     "resultado": f"{usuario.correo}{usuario.administrador}{usuario.nombre}"
 // }), 201
 
-Enpoint seguros
-@app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
+
 
