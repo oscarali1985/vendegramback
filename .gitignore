@@ -7,5 +7,5 @@ public/*
 dist/*
 package.json
 migrations/*
-
+theia/*
 __pycache__/
