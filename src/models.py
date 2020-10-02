@@ -442,7 +442,7 @@ class Producto(db.Model):
         return True  
 
     def __repr__(self):
-        return '<Producto %r>' % self.titulo
+        return '<Producto %r>' % self.titulo       
         
 
     def serialize(self):
@@ -457,7 +457,8 @@ class Producto(db.Model):
             "etiqueta_uno": self.etiqueta_uno.value,
             "etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",         
             "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else "",
-            # "nombre_tienda": self.tienda.nombre_tienda
+            # "nombre_tienda": [self.tienda.nombre_tienda]
+            # "nombre_tienda": [productos.tienda_id for productos in self.tienda_id]
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
             }    
 
