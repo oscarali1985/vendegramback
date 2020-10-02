@@ -440,7 +440,7 @@ class Producto(db.Model):
         if "etiqueta_tres" in diccionario:
             self.etiqueta_tres = Etiqueta(diccionario["etiqueta_tres"]) if diccionario["etiqueta_tres"] else None                                               
         return True  
-#Etiqueta(etiqueta_tres) if etiqueta_tres else None 
+
     def __repr__(self):
         return '<Producto %r>' % self.titulo
         
@@ -456,7 +456,8 @@ class Producto(db.Model):
             "etiqueta_general": self.etiqueta_general.value,
             "etiqueta_uno": self.etiqueta_uno.value,
             "etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",         
-            "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else ""
+            "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else "",
+            # "nombre_tienda": self.tienda.nombre_tienda
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
             }    
 
