@@ -117,7 +117,8 @@ class Usuario(db.Model):
             "telefono":self.telefono,
             "foto_perfil":self.foto_perfil,
             "suscripcion":self.suscripcion, 
-            "administrador":self.administrador
+            "administrador":self.administrador,
+            "clave":self.clave_hash
         }
 
 
@@ -136,27 +137,38 @@ class Usuario(db.Model):
             self.correo = diccionario["correo"].casefold().strip()
         if "telefono" in diccionario:
             self.telefono = diccionario["telefono"].strip()
-        if "clave" in diccionario:
-            self.clave_hash = diccionario["clave"].strip()
         if "foto_perfil" in diccionario:
             self.foto_perfil = diccionario["foto_perfil"].strip()
         if "suscripcion" in diccionario:
-            self.suscripcion = diccionario["suscripcion"]    
+            self.suscripcion = diccionario["suscripcion"]   
+        if "administrador" in diccionario:
+            self.administrador = diccionario["administrador"]        
 
         # for (key, value) in diccionario.items():
         #     if hasattr(self, key) and key != "cedula":
         #         self[key] = value
         return True
 
+    def actualizar_clave(self, diccionario):
+        """ actualiza propiedades del usuario según el contenido del diccionario """
+        print("Actualizando clave")
+        if "clave" in diccionario:
+            nclave = diccionario["clave"].strip()
+            print(nclave)
+            self.clave_hash = generate_password_hash(f"{nclave}{self.salt}")
+            print(self.clave_hash)
+        return True
 
+    def actualizar_clavealeatoria(self, nuevaclave):
+        """ actualiza propiedades del usuario según el contenido del diccionario """
+        print("Actualizando clave")
+        self.clave_hash = generate_password_hash(f"{nuevaclave}{self.salt}")
+        print(self.clave_hash)
+        return True
 
+    
 
-
-
-
-
-
-########################134
+########################159
 #
 #    Suscripcion
 #

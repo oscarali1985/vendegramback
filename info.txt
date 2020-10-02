@@ -12,4 +12,15 @@ usuario= Usuario.query.get(usuario_id_jwt)
 // }), 201
 
 
+Enpoint  no requieren login
+@app.route("/ingresar", methods = ['POST'])
+@app.route("/usuario", methods=["GET", "POST"])
+@app.route('/producto', methods=["GET", "POST"])
+
+Enpoint seguros requieren login
+@app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
+@app.route('/producto/<int:producto_id>', methods=['DELETE'])
+@app.route('/producto/<int:producto_id>', methods=['PUT'])
+@app.route("/cambiouclauario/<id>", methods=["PUT"])
+@app.route("/cambioclaveale/<id>", methods=["PUT",])
 
