@@ -570,7 +570,6 @@ def cambioclavealetaria(id):
 
 @app.route("/cambioclavecorreo/<nombre_usuario>", methods=["PUT"])
 
-
 def cambioclavecorreo(nombre_usuario):
     """
         PUT actualizar la clave de un usuario en particular
@@ -578,6 +577,7 @@ def cambioclavecorreo(nombre_usuario):
     usuariob = nombre_usuario
     correovalid=False
     usuariovalid= False
+    dato = ""
     print(usuariob)
     # crear una variable y asignar el usuario específico
     usuario=Usuario.query.filter(Usuario.nombre_usuario.like(usuariob))
@@ -588,11 +588,13 @@ def cambioclavecorreo(nombre_usuario):
     for row in usuario:
         if (row.nombre_usuario==usuariob):
             usuariovalid= True
+            dato = nombre_usuario
             usuario = Usuario.query.get(row.id)
         print ("ID:", row.id, "Name: ",row.nombre_usuario, "Email:",row.correo)
     for row in correo:
         if (row.correo==usuariob):
             correovalid= True
+            dato = nombre_usuario
             usuario = Usuario.query.get(row.id)
         print ("ID:", row.id, "Name: ",row.nombre_usuario, "Email:",row.correo)    
     
@@ -617,7 +619,7 @@ def cambioclavecorreo(nombre_usuario):
                 #email = sendEmail(titulocorreo, nombre, correo, mensaje)
                 # devolver el usuario serializado y jsonificado. Y 200 
                 return jsonify({
-                                "resultado": f"La clave del usuario {usuario.id} ha sido actualizada y enviada por correo"
+                                "resultado": f"La clave asignada a {dato} ha sido actualizada y enviada por correo"
                                 }), 200
             except Exception as error:
                 db.session.rollback()
