@@ -16,6 +16,7 @@ Enpoint  no requieren login
 @app.route("/ingresar", methods = ['POST'])
 @app.route("/usuario", methods=["GET", "POST"])
 @app.route('/producto', methods=["GET", "POST"])
+@app.route("/cambioclavecorreo/nombre_usuario", methods=["PUT"])
 
 Enpoint seguros requieren login
 @app.route("/usuario/<id>", methods=["GET", "PUT", "DELETE"])
@@ -24,3 +25,90 @@ Enpoint seguros requieren login
 @app.route("/cambiouclauario/<id>", methods=["PUT"])
 @app.route("/cambioclaveale/<id>", methods=["PUT",])
 
+
+Login post
+
+http://localhost:5000/ingresar
+
+{
+	"correo": "oscarali1985@gmail.com",
+	"clave":"1234"
+}
+
+Cambio de clave
+
+http://localhost:5000/cambioucsuario/id
+
+{
+	"clave":"1234"
+}
+ http://localhost:5000/cambioualesuario/
+
+ sin body
+
+ http://localhost:5000/cambioclavecorreo/dato
+
+ dato puede ser correo o clave
+
+
+
+Usuarios
+
+Get o post
+http://localhost:5000/usuario/
+
+Get por filtro
+http://localhost:5000/usuario?nombre=oscar
+
+/ Insertar usuario
+
+{
+	"nombre": "Oscar Ali",
+	"apellido": "Mariño",
+	"nombre_usuario": "oscarali1984",
+	"fecha_nacimiento": "1985/05/25",
+	"correo": "oscar1985@gmail.com",
+	"telefono": "584126147743",
+	"clave":"1234",
+	"foto_perfil": "foto",
+    "administrador": true,
+    "suscripcion": null
+}
+
+GET POST DELETE
+http://localhost:5000/usuario/id
+
+
+
+Productos 
+
+http://localhost:5000/producto?titulo=lipton
+
+http://localhost:5000/producto?etiqueta=bebidas
+
+http://localhost:5000/producto?zona=la_pastora
+
+http://localhost:5000/producto?titulo=pepsi&etiqueta=productos
+
+http://localhost:5000/producto?titulo=lipton&zona=la_pastora
+
+http://localhost:5000/producto?etiqueta=servicios&zona=distrito_capital
+
+http://localhost:5000/producto?titulo=lipton&etiqueta=detergentes&zona=la_pastora&all=True
+
+
+
+/
+
+//Insertar Producto
+
+{
+    "cantidad": 3,
+    "descripcion": "delicioso",
+    "etiqueta_dos": "alimentos",
+    "etiqueta_tres": "refrescos",
+    "etiqueta_uno": "",
+    "foto": "foto",
+    "precio": 15.0,
+    "titulo": "chocolate"
+}
