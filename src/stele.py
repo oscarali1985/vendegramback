@@ -47,6 +47,3 @@ def sendTelegram(nombre,telegram,mensaje):
         #flash(Mensaje.format(errorCode), 'alert-danger')
         return jsonify(Mensaje), 400
     
-
-    
-    

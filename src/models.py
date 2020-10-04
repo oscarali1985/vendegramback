@@ -2,21 +2,9 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timezone
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime, Float
 import enum
-
-
-
-
-# Mas importaciones
-
-
-
-
-
-
-
-# Mas importaciones
-
-
+import json, os
+from base64 import b64encode
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 db = SQLAlchemy()
@@ -35,12 +23,13 @@ class Usuario(db.Model):
     fecha_nacimiento = db.Column(db.Date())
     correo = db.Column(db.String(50), unique=True, nullable=False)
     telefono= db.Column(db.String(20), unique=False, nullable=False)
-    clave_hash = db.Column(db.String(50), unique=False, nullable=False)
+    clave_hash = db.Column(db.String(250), nullable=False)
+    salt = db.Column(db.String(16), nullable=False)
     foto_perfil = db.Column(db.String(50), unique=False, nullable=True)
     administrador = db.Column(db.Boolean(), unique=False, nullable=False)
     suscripcion = db.Column(db.Integer, unique=False, nullable=True)
 
-    def __init__(self, nombre, apellido, nombre_usuario, fecha_nacimiento, correo, telefono, clave_hash, foto_perfil, administrador, suscripcion):
+    def __init__(self, nombre, apellido, nombre_usuario, fecha_nacimiento, correo, telefono, clave, foto_perfil, administrador, suscripcion):
         """ crea y devuelve una instancia de esta clase """
         self.nombre = nombre
         self.apellido = apellido
@@ -48,10 +37,23 @@ class Usuario(db.Model):
         self.fecha_nacimiento = fecha_nacimiento
         self.correo = correo
         self.telefono = telefono
-        self.clave_hash = clave_hash
+        self.salt = b64encode(os.urandom(4)).decode("utf-8")
+        self.set_password(clave)
         self.foto_perfil = foto_perfil
         self.administrador = administrador
         self.suscripcion = suscripcion
+
+
+    def set_password(self, clave):
+
+        """
+        hash y guarda
+        """
+        self.clave_hash = generate_password_hash(f"{clave}{self.salt}")
+
+    def check_password(self, clave):
+        """ Se verifica si clave coincide """
+        return check_password_hash(self.clave_hash, f"{clave}{self.salt}")
 
     def __str__(self):
         return f"\t{self.id} ->  {self.nombre_completo}"
@@ -121,31 +123,44 @@ class Usuario(db.Model):
             self.correo = diccionario["correo"].casefold().strip()
         if "telefono" in diccionario:
             self.telefono = diccionario["telefono"].strip()
-        if "clave" in diccionario:
-            self.clave_hash = diccionario["clave"].strip()
         if "foto_perfil" in diccionario:
             self.foto_perfil = diccionario["foto_perfil"].strip()
         if "suscripcion" in diccionario:
-            self.suscripcion = diccionario["suscripcion"]    
+            self.suscripcion = diccionario["suscripcion"]   
+        if "administrador" in diccionario:
+            self.administrador = diccionario["administrador"]        
 
         # for (key, value) in diccionario.items():
         #     if hasattr(self, key) and key != "cedula":
         #         self[key] = value
         return True
 
+    def actualizar_clave(self, diccionario):
+        """ actualiza propiedades del usuario según el contenido del diccionario """
+        print("Actualizando clave")
+        if "clave" in diccionario:
+            nclave = diccionario["clave"].strip()
+            print(nclave)
+            self.clave_hash = generate_password_hash(f"{nclave}{self.salt}")
+            print(self.clave_hash)
+        return True
 
+    def actualizar_clavealeatoria(self, nuevaclave):
+        """ actualiza propiedades del usuario según el contenido del diccionario """
+        print("Actualizando clave")
+        self.clave_hash = generate_password_hash(f"{nuevaclave}{self.salt}")
+        print(self.clave_hash)
+        return True
 
+    
 
-
-
-
-
-
-########################134
+########################159
 #
 #    Suscripcion
 #
 ########################
+
+
 
 
 
@@ -247,7 +262,7 @@ class Tienda(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre_tienda = db.Column(db.String(40), unique=True, nullable=False)
     correo_tienda = db.Column(db.String(30), unique=True, nullable=False)
-    telefono_tienda = db.Column(db.Integer, nullable=True)
+    telefono_tienda = db.Column(db.String(30), nullable=True)
     foto_tienda = db.Column(db.String(200), nullable=True)
     facebook_tienda = db.Column(db.String(30), nullable=True)
     instagram_tienda = db.Column(db.String(30), nullable=True)

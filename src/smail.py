@@ -16,10 +16,6 @@ app.config.update(
 	MAIL_USERNAME = 'vendegram@gmail.com',
 	)
 mail = Mail(app)
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
 '''
 def sendEmail(titulocorreo,nombre,correo,men):
     # create message object instance
