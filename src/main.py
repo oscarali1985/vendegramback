@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap, validate_email_syntax
 from admin import setup_admin
-from models import db, Usuario, Producto
+from models import db, Usuario, Producto, Tienda
 from smail import sendEmail
 from stele import sendTelegram
 from base64 import b64encode
@@ -233,7 +233,14 @@ def crud_usuario(id):
 
 
 
-########################235
+
+
+
+
+
+
+
+########################201
 #
 #    Tienda
 #
@@ -360,11 +367,6 @@ def actualizar_tienda(tienda_id):
         return jsonify({
             "Presente error al actualizar un tienda": f"{error.args}"
         }), 500    
-
-
-
-
-
 
 
 
@@ -662,6 +664,19 @@ def actualizar_producto(producto_id):
         return jsonify({
             "Presente error al actualizar un producto": f"{error.args}"
         }), 500    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

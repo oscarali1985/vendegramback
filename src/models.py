@@ -211,12 +211,31 @@ class Usuario(db.Model):
 
 
 
+        """
+            normalizacion de nombre foto, etc...
+            crea un objeto de la clase tienda con
+            esa normalizacion y devuelve la instancia creada.
+        """
+        nuevo_tienda = cls(
+            nombre_tienda,
+            correo_tienda,
+            telefono_tienda,
+            foto_tienda,
+            facebook_tienda,
+            instagram_tienda,
+            twitter_tienda,
+            zona_general,
+            zona_uno,
+            zona_dos,
+            zona_tres
+        )
+        return nuevo_tienda 
+
 ########################191
 #
 #    Tienda
 #
 ########################
-
 class Zona_general(enum.Enum):
     DISTRITO_CAPITAL = "Distrito Capital"
     MIRANDA = "Miranda"
@@ -261,7 +280,7 @@ class Tienda(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre_tienda = db.Column(db.String(40), unique=True, nullable=False)
     correo_tienda = db.Column(db.String(30), unique=True, nullable=False)
-    telefono_tienda = db.Column(db.Integer, nullable=True)
+    telefono_tienda = db.Column(db.String(30), nullable=True)
     foto_tienda = db.Column(db.String(200), nullable=True)
     facebook_tienda = db.Column(db.String(30), nullable=True)
     instagram_tienda = db.Column(db.String(30), nullable=True)
@@ -357,31 +376,7 @@ class Tienda(db.Model):
             "zona_tres": self.zona_tres.value if self.zona_tres else ""
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
             }    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+             
 
 
 ########################136
@@ -502,63 +497,6 @@ class Producto(db.Model):
 
 #"etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",
                 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-########################
-#
-#    Calificacion
-#
-########################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
