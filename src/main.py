@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap, validate_email_syntax
 from admin import setup_admin
-from models import db, Usuario, Producto, Tienda
+from models import db, Usuario, Producto
 from smail import sendEmail
 from stele import sendTelegram
 from base64 import b64encode
@@ -125,12 +125,12 @@ def cr_usuario():
             db.session.add(nuevo_usuario)
             try:
                 db.session.commit()
-                titulocorreo= "Registro satisfactorio"
-                nombre=dato_reg["nombre"]
-                correo=dato_reg["correo"]
-                nombreusuario=dato_reg["nombre_usuario"]
-                mensaje = f"gracias por registrarse su usuario es {nombreusuario}"
-                email = sendEmail(titulocorreo, nombre, correo, mensaje)
+                #titulocorreo= "Registro satisfactorio"
+                #nombre=dato_reg["nombre"]
+                #correo=dato_reg["correo"]
+                #nombreusuario=dato_reg["nombre_usuario"]
+                #mensaje = f"gracias por registrarse su usuario es {nombreusuario}"
+                #email = sendEmail(titulocorreo, nombre, correo, mensaje)
                 # devolvemos el nuevo usuario serializado y 201_CREATED
                 return jsonify(nuevo_usuario.serializar()), 201
             except Exception as error:
@@ -219,9 +219,9 @@ def crud_usuario(id):
                     "resultado": "No tiene permiso para realizar esta operacion"
                 }), 404
 
+    
 
-
-########################201
+########################224
 #
 #    Tienda
 #
@@ -348,15 +348,6 @@ def actualizar_tienda(tienda_id):
         return jsonify({
             "Presente error al actualizar un tienda": f"{error.args}"
         }), 500    
-
-
-
-
-
-
-
-
-
 
 
 
@@ -663,6 +654,12 @@ def actualizar_producto(producto_id):
 
 
 
+
+
+
+
+
+
 ########################356
 #
 #    Envoar ccorreo o mensajes telegram
@@ -862,6 +859,7 @@ def cambioclavealetaria(id):
 
 @app.route("/cambioclavecorreo/<nombre_usuario>", methods=["PUT"])
 
+
 def cambioclavecorreo(nombre_usuario):
     """
         PUT actualizar la clave de un usuario en particular
@@ -869,7 +867,6 @@ def cambioclavecorreo(nombre_usuario):
     usuariob = nombre_usuario
     correovalid=False
     usuariovalid= False
-    dato = ""
     print(usuariob)
     # crear una variable y asignar el usuario específico
     usuario=Usuario.query.filter(Usuario.nombre_usuario.like(usuariob))
@@ -880,13 +877,11 @@ def cambioclavecorreo(nombre_usuario):
     for row in usuario:
         if (row.nombre_usuario==usuariob):
             usuariovalid= True
-            dato = nombre_usuario
             usuario = Usuario.query.get(row.id)
         print ("ID:", row.id, "Name: ",row.nombre_usuario, "Email:",row.correo)
     for row in correo:
         if (row.correo==usuariob):
             correovalid= True
-            dato = nombre_usuario
             usuario = Usuario.query.get(row.id)
         print ("ID:", row.id, "Name: ",row.nombre_usuario, "Email:",row.correo)    
     
@@ -904,14 +899,14 @@ def cambioclavecorreo(nombre_usuario):
             # guardar en base de datos, hacer commit
             try:
                 db.session.commit()
-                #titulocorreo= "Cambio de clave satisfactorio"
-                #nombre=usuario.nombre
-                #correo=usuario.correo
-                #mensaje = f"Se ha realizado un cambio de clave '{nuevaclave}' "
-                #email = sendEmail(titulocorreo, nombre, correo, mensaje)
+                titulocorreo= "Cambio de clave satisfactorio"
+                nombre=usuario.nombre
+                correo=usuario.correo
+                mensaje = f"Se ha realizado un cambio de clave '{nuevaclave}' "
+                email = sendEmail(titulocorreo, nombre, correo, mensaje)
                 # devolver el usuario serializado y jsonificado. Y 200 
                 return jsonify({
-                                "resultado": f"La clave asignada a {dato} ha sido actualizada y enviada por correo"
+                                "resultado": f"La clave del usuario {usuario.id} ha sido actualizada y enviada por correo"
                                 }), 200
             except Exception as error:
                 db.session.rollback()
