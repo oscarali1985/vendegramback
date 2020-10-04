@@ -25,6 +25,8 @@ db.init_app(app)
 jwt = JWTManager(app)
 CORS(app)
 setup_admin(app)
+
+
 # Maneja/sereliza errores como un objeto JSON 26
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -33,7 +35,14 @@ def handle_invalid_usage(error):
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
-########################35
+
+
+
+
+
+
+
+########################45
 #
 #    Usuarios
 #
@@ -59,7 +68,7 @@ def cr_usuario():
             usuarios_filtrados = usuarios
         #   serializar los objetos de la lista - tendría una lista de diccionarios
         usuarios_serializados = list(map(lambda usuario: usuario.serializar(), usuarios_filtrados))
-        print(usuarios_serializados)
+        #print(usuarios_serializados)
         #   devolver la lista jsonificada y 200_OK
         return jsonify(usuarios_serializados), 200
         
@@ -103,8 +112,8 @@ def cr_usuario():
 
         # Se procede a validar el correo
         validcorreo = validate_email_syntax(dato_reg["correo"])
-        print("Validando correo")
-        print(validcorreo)
+        #print("Validando correo")
+        #print(validcorreo)
         if validcorreo == True:
 
             #   crear una variable y asignarle el nuevo usuario con los datos validados
@@ -162,9 +171,9 @@ def crud_usuario(id):
     usuario_id_jwt = get_jwt_identity()
     usuario= Usuario.query.get(usuario_id_jwt)
     admin = usuario.administrador
-    print(usuario_id_jwt)
-    print(usuario)
-    print(admin)
+    #print(usuario_id_jwt)
+    #print(usuario)
+    #print(admin)
 
     if (admin == True):
         #
@@ -179,7 +188,7 @@ def crud_usuario(id):
                     # recuperar diccionario con insumos del body del request
                     diccionario = request.get_json()
                     # actualizar propiedades que vengan en el diccionario
-                    print(diccionario)
+                    #print(diccionario)
                     usuario.actualizar_usuario(diccionario)
                     # guardar en base de datos, hacer commit
                     try:
@@ -221,8 +230,10 @@ def crud_usuario(id):
 
     
 
-<<<<<<< HEAD
-########################224
+
+
+
+########################235
 #
 #    Tienda
 #
@@ -357,8 +368,8 @@ def actualizar_tienda(tienda_id):
 
 
 
-=======
->>>>>>> f3bac1c72b102c251ba7f2b63995cff8dcccec7a
+
+
 
 
 
@@ -755,9 +766,9 @@ def cambiocusuario(id):
     usuario_id_jwt = get_jwt_identity()
     usuario= Usuario.query.get(usuario_id_jwt)
     admin = usuario.administrador
-    print(usuario_id_jwt)
-    print(usuario)
-    print(admin)
+    #print(usuario_id_jwt)
+    #print(usuario)
+    #print(admin)
 
     if (admin == True):
         #
@@ -769,7 +780,7 @@ def cambiocusuario(id):
                     # recuperar diccionario con insumos del body del request
                     diccionario = request.get_json()
                     # actualizar propiedades que vengan en el diccionario
-                    print(diccionario)
+                    #print(diccionario)
                     usuario.actualizar_clave(diccionario)
                     # guardar en base de datos, hacer commit
                     try:
@@ -807,9 +818,9 @@ def cambioclavealetaria(id):
     usuario_id_jwt = get_jwt_identity()
     usuario= Usuario.query.get(usuario_id_jwt)
     admin = usuario.administrador
-    print(usuario_id_jwt)
-    print(usuario)
-    print(admin)
+    #print(usuario_id_jwt)
+    #print(usuario)
+    #print(admin)
 
     if (admin == True):
         #
@@ -863,7 +874,7 @@ def cambioclavecorreo(nombre_usuario):
     usuariob = nombre_usuario
     correovalid=False
     usuariovalid= False
-    print(usuariob)
+    #print(usuariob)
     # crear una variable y asignar el usuario específico
     usuario=Usuario.query.filter(Usuario.nombre_usuario.like(usuariob))
     correo=Usuario.query.filter(Usuario.correo.like(usuariob))
@@ -874,19 +885,19 @@ def cambioclavecorreo(nombre_usuario):
         if (row.nombre_usuario==usuariob):
             usuariovalid= True
             usuario = Usuario.query.get(row.id)
-        print ("ID:", row.id, "Name: ",row.nombre_usuario, "Email:",row.correo)
+        #print ("ID:", row.id, "Name: ",row.nombre_usuario, "Email:",row.correo)
     for row in correo:
         if (row.correo==usuariob):
             correovalid= True
             usuario = Usuario.query.get(row.id)
-        print ("ID:", row.id, "Name: ",row.nombre_usuario, "Email:",row.correo)    
+        #print ("ID:", row.id, "Name: ",row.nombre_usuario, "Email:",row.correo)    
     
     #print(usuario)
     
     
     # verificar si el usuario con id usuario_id existe
     if (correovalid== True or usuariovalid== True):
-        print(usuario)
+        #print(usuario)
         if request.method == "PUT":
             # recuperar diccionario con insumos del body del request
             nuevaclave = b64encode(os.urandom(4)).decode("utf-8")
