@@ -117,8 +117,7 @@ class Usuario(db.Model):
             "telefono":self.telefono,
             "foto_perfil":self.foto_perfil,
             "suscripcion":self.suscripcion, 
-            "administrador":self.administrador,
-            "clave":self.clave_hash
+            "administrador":self.administrador
         }
 
 
