@@ -28,6 +28,15 @@ class Usuario(db.Model):
     foto_perfil = db.Column(db.String(50), unique=False, nullable=True)
     administrador = db.Column(db.Boolean(), unique=False, nullable=False)
     suscripcion = db.Column(db.Integer, unique=False, nullable=True)
+    suscripciones = db.relationship("Suscripcion", backref="usuario") 
+    fecha_registro = db.Column(db.Date())
+
+    #usuario_id = db.relationship("Tienda", backref="usuario", uselist=False)
+    #usuario_id = db.relationship("Suscripcion", backref="usuario", uselist=False)
+    #usuario_id = db.relationship("Calificacion", backref="usuario", uselist=False)
+
+    #usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
+
 
     def __init__(self, nombre, apellido, nombre_usuario, fecha_nacimiento, correo, telefono, clave, foto_perfil, administrador, suscripcion):
         """ crea y devuelve una instancia de esta clase """
@@ -42,6 +51,7 @@ class Usuario(db.Model):
         self.foto_perfil = foto_perfil
         self.administrador = administrador
         self.suscripcion = suscripcion
+        self.fecha_registro = date.today()
 
 
     def set_password(self, clave):
@@ -92,8 +102,11 @@ class Usuario(db.Model):
 
         date_str = str(self.fecha_nacimiento)
         date_object = datetime.strptime(date_str, '%Y-%m-%d').date()
-        print(type(date_object))
-        print(date_object) 
+
+        datereg_str = str(self.fecha_registro)
+        date_object = datetime.strptime(datereg_str, '%Y-%m-%d').date()
+        #print(type(date_object))
+        #print(date_object) 
         return {
             "id": self.id,
             "nombre": self.nombre,
@@ -104,7 +117,8 @@ class Usuario(db.Model):
             "telefono":self.telefono,
             "foto_perfil":self.foto_perfil,
             "suscripcion":self.suscripcion, 
-            "administrador":self.administrador
+            "administrador":self.administrador,
+            "fecha_registro":datereg_str
         }
 
 
@@ -152,6 +166,24 @@ class Usuario(db.Model):
         print(self.clave_hash)
         return True
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 
 ########################159
@@ -162,6 +194,55 @@ class Usuario(db.Model):
 
 
 
+class Planes(enum.Enum):   
+    BASICO = "basico"
+   
+class Suscripcion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    plan = db.Column(db.Enum(Planes), nullable=False)
+    fecha_registro = db.Column(db.Date())
+    usuario_id = db.Column(db.Integer, ForeignKey('usuario.id'))
+
+
+    def __init__(self, plan, nombre_tienda):
+        self.plan = Planes(plan),
+        self.fecha_registro = date.today()
+        # self.nombre_tienda = Tienda(nombre_tienda)
+
+
+    @classmethod
+    def nuevo_sub(cls, plan):
+        """
+            normalizacion de nombre foto, etc...
+            crea un objeto de la clase Suscripcion con
+            esa normalizacion y devuelve la instancia creada.
+        """
+        nuevo_suscriptor = cls(
+            plan
+        )
+        return nuevo_suscriptor 
+
+    def update(self, diccionario):
+        """Actualizacion de Suscripcion"""
+        if "plan" in diccionario:
+            self.plan = Planes(diccionario["plan"]) if diccionario["plan"] else None
+        return True  
+
+    def __repr__(self):
+        return '<Suscripcion %r>' % self.plan       
+        
+
+    def serialize(self):
+
+        datereg_str = str(self.fecha_registro)
+        date_object = datetime.strptime(datereg_str, '%Y-%m-%d').date()
+        return {
+            "id": self.id,
+            "plan": self.plan.value,
+            "fecha_registro":datereg_str
+            # 'tienda': self.tienda.nombre_tienda
+            # "tienda": [self.tienda.nombre_tienda]
+        }
 
 
 
@@ -274,6 +355,7 @@ class Tienda(db.Model):
     productos = db.relationship("Producto", backref="tienda") 
 
 
+
     def __init__(self, nombre_tienda, correo_tienda, telefono_tienda, foto_tienda, facebook_tienda, 
     instagram_tienda, twitter_tienda, zona_general, zona_uno, zona_dos, zona_tres):
         self.nombre_tienda = nombre_tienda
@@ -343,6 +425,12 @@ class Tienda(db.Model):
         
 
     def serialize(self):
+
+        producto_list = self.productos
+        lista_id = []
+        for producto in producto_list:
+            lista_id.append(producto.titulo)
+
         return {
             "id": self.id,
             "nombre_tienda": self.nombre_tienda,
@@ -355,7 +443,8 @@ class Tienda(db.Model):
             "zona_general": self.zona_general.value,
             "zona_uno": self.zona_uno.value if self.zona_uno else "",
             "zona_dos": self.zona_dos.value if self.zona_dos else "",
-            "zona_tres": self.zona_tres.value if self.zona_tres else ""
+            "zona_tres": self.zona_tres.value if self.zona_tres else "",
+            "producto": lista_id
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
             }    
              
@@ -461,6 +550,12 @@ class Producto(db.Model):
         
 
     def serialize(self):
+
+        tienda_list = [self.tienda]
+        lista_id = []
+        for tienda in tienda_list:
+            lista_id.append(tienda.nombre_tienda)
+
         return {
             "id": self.id,
             "titulo": self.titulo,
@@ -472,6 +567,7 @@ class Producto(db.Model):
             "etiqueta_uno": self.etiqueta_uno.value,
             "etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",         
             "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else "",
+            "tienda": lista_id
             # "nombre_tienda": [self.tienda.nombre_tienda]
             # "nombre_tienda": [productos.tienda_id for productos in self.tienda_id]
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
