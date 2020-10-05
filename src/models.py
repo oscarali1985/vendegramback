@@ -28,6 +28,14 @@ class Usuario(db.Model):
     foto_perfil = db.Column(db.String(50), unique=False, nullable=True)
     administrador = db.Column(db.Boolean(), unique=False, nullable=False)
     suscripcion = db.Column(db.Integer, unique=False, nullable=True)
+    fecha_registro = db.Column(db.Date())
+
+    #usuario_id = db.relationship("Tienda", backref="usuario", uselist=False)
+    #usuario_id = db.relationship("Suscripcion", backref="usuario", uselist=False)
+    #usuario_id = db.relationship("Calificacion", backref="usuario", uselist=False)
+
+    #usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
+    
 
     def __init__(self, nombre, apellido, nombre_usuario, fecha_nacimiento, correo, telefono, clave, foto_perfil, administrador, suscripcion):
         """ crea y devuelve una instancia de esta clase """
@@ -42,6 +50,7 @@ class Usuario(db.Model):
         self.foto_perfil = foto_perfil
         self.administrador = administrador
         self.suscripcion = suscripcion
+        self.fecha_registro = date.today()
 
 
     def set_password(self, clave):
@@ -79,7 +88,7 @@ class Usuario(db.Model):
             clave.strip(),
             foto_perfil,
             administrador,
-            suscripcion
+            suscripcion,
         )
         return nuevo_usuario
 
@@ -92,8 +101,11 @@ class Usuario(db.Model):
 
         date_str = str(self.fecha_nacimiento)
         date_object = datetime.strptime(date_str, '%Y-%m-%d').date()
-        print(type(date_object))
-        print(date_object) 
+
+        datereg_str = str(self.fecha_registro)
+        date_object = datetime.strptime(datereg_str, '%Y-%m-%d').date()
+        #print(type(date_object))
+        #print(date_object) 
         return {
             "id": self.id,
             "nombre": self.nombre,
@@ -104,7 +116,8 @@ class Usuario(db.Model):
             "telefono":self.telefono,
             "foto_perfil":self.foto_perfil,
             "suscripcion":self.suscripcion, 
-            "administrador":self.administrador
+            "administrador":self.administrador,
+            "fecha_registro":datereg_str
         }
 
 
