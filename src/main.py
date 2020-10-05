@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap, validate_email_syntax
 from admin import setup_admin
-from models import db, Usuario, Producto, Tienda
+from models import db, Usuario, Producto, Tienda, Suscripcion
 from smail import sendEmail
 from stele import sendTelegram
 from base64 import b64encode
@@ -229,6 +229,134 @@ def crud_usuario(id):
                 }), 404
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################159
+#
+#    Suscripcion
+#
+########################
+
+
+
+@app.route('/suscripcion', methods=["GET", "POST"])
+
+def todos_Suscripcion():
+    if request.method == "GET":
+        suscripcion = Suscripcion.query.all()
+        # verificamos si hay parámetros en la url y filtramos la lista con eso si titulo no esta vacio producto_filtrado busca en producto.titulo si el requerimiento es igual a algun titulo ya creado para filtrarlo.
+        plan = request.args.get("plan")
+        if plan is not None:
+            suscripcion_filtrado = filter(lambda suscripcion: plan.lower() in suscripcion.plan, suscripcion) 
+        else:
+            suscripcion_filtrado = suscripcion
+        #   serializar los objetos de la lista - tendría una lista de diccionarios
+        suscripcion_lista = list(map(lambda suscripcion: suscripcion.serialize(), suscripcion_filtrado))     
+        return jsonify(suscripcion_lista), 200
+   ###Validaciones de caracteres y que los campos no esten vacios###
+    else:
+        insumos_producto = request.json
+        if insumos_producto is None:
+            return jsonify({
+                "resultado": "no envio insumos para crear el producto" 
+            }), 400
+
+        # METODO POST: crear una variable y asignarle el nuevo producto con los datos validados
+
+        body = request.get_json()        
+        suscripcion = Suscripcion(plan=body['plan'])
+        #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
+        db.session.add(suscripcion)
+        try:
+            db.session.commit()
+            # devolvemos el nuevo donante serializado y 201_CREATED
+            return jsonify(suscripcion.serialize()), 201
+        except Exception as error:
+            db.session.rollback()
+            print(f"{error.args} {type(error)}")
+            # devolvemos "mira, tuvimos este error..."
+            return jsonify({
+                "resultado2": f"{error.args}"
+            }), 500
+
+##########  4.- Eliminar un producto DELETE /producto/{producto_id} ########### 
+
+@app.route('/suscripcion/<int:suscripcion_id>', methods=['DELETE'])
+def eliminar_suscripcion(suscripcion_id):
+    suscripcion = Suscripcion.query.get(suscripcion_id)
+    if suscripcion is None:
+        raise APIException('suscripcion no encontrado', status_code=404)
+    else:
+        # remover el suscripcion específico de la sesión de base de datos
+        db.session.delete(suscripcion)
+        # hacer commit y devolver 200
+        try:
+            db.session.commit()
+            response_body = {
+           "msg": "La suscripcion a sido eliminada"
+           }
+            return jsonify(response_body), 200
+        except Exception as error:
+            db.session.rollback()
+            print(f"{error.args} {type(error)}")
+            return jsonify({
+                "resultado al eliminar una suscripcion": f"{error.args}"
+            }), 500
+
+
+##########  5.- Actualiza el suscripcion UPDATE /producto/{producto_id} ###########     
+@app.route('/suscripcion/<int:suscripcion_id>', methods=['PUT'])
+def actualizar_suscripcion(suscripcion_id):
+    body = request.get_json()
+    suscripcion = Suscripcion.query.get(suscripcion_id)
+    if suscripcion is None:
+        raise APIException('suscripcion no encontrado', status_code=404) 
+    suscripcion.update(body)
+    try:
+        db.session.commit()
+        # devolvemos el nuevo suscripcion serializado y 200_CREATED
+        return jsonify(suscripcion.serialize()), 200
+    except Exception as error:
+        db.session.rollback()
+        print(f"{error.args} {type(error)}")
+        # devolvemos "mira, tuvimos este error..."
+        return jsonify({
+            "Presente error al actualizar un suscripcion": f"{error.args}"
+        }), 500    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
