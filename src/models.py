@@ -444,7 +444,7 @@ class Tienda(db.Model):
             "zona_uno": self.zona_uno.value if self.zona_uno else "",
             "zona_dos": self.zona_dos.value if self.zona_dos else "",
             "zona_tres": self.zona_tres.value if self.zona_tres else "",
-            "producto": lista_id
+            "productos": lista_id
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
             }    
              
@@ -492,7 +492,7 @@ class Producto(db.Model):
     tienda_id = db.Column(db.Integer, ForeignKey('tienda.id'))
 
 
-    def __init__(self, titulo, foto, descripcion, precio, cantidad, etiqueta_general, etiqueta_uno, etiqueta_dos, etiqueta_tres):
+    def __init__(self, titulo, foto, descripcion, precio, cantidad, etiqueta_general, etiqueta_uno, etiqueta_dos, etiqueta_tres, tienda_id):
         self.titulo = titulo
         self.foto = foto
         self.descripcion = descripcion
@@ -501,10 +501,11 @@ class Producto(db.Model):
         self.etiqueta_general = Etiqueta_general(etiqueta_general)
         self.etiqueta_uno = Etiqueta(etiqueta_uno)
         self.etiqueta_dos = Etiqueta(etiqueta_dos) if etiqueta_dos else None
-        self.etiqueta_tres = Etiqueta(etiqueta_tres) if etiqueta_tres else None   
+        self.etiqueta_tres = Etiqueta(etiqueta_tres) if etiqueta_tres else None 
+        self.tienda_id = tienda_id  
 
     @classmethod
-    def nuevo(cls, titulo, foto, descripcion, precio, cantidad, etiqueta_general, etiqueta_uno, etiqueta_dos, etiqueta_tres):
+    def nuevo(cls, titulo, foto, descripcion, precio, cantidad, etiqueta_general, etiqueta_uno, etiqueta_dos, etiqueta_tres, tienda_id):
         """
             normalizacion de nombre foto, etc...
             crea un objeto de la clase producto con
@@ -519,7 +520,8 @@ class Producto(db.Model):
             etiqueta_general,
             etiqueta_uno,
             etiqueta_dos,
-            etiqueta_tres
+            etiqueta_tres,
+            tienda_id            
         )
         return nuevo_producto 
 
@@ -551,10 +553,10 @@ class Producto(db.Model):
 
     def serialize(self):
 
-        tienda_list = [self.tienda]
-        lista_id = []
-        for tienda in tienda_list:
-            lista_id.append(tienda.nombre_tienda)
+        # tienda_list = [self.tienda]
+        # lista_id = []
+        # for tienda in tienda_list:
+        #     lista_id.append(tienda.nombre_tienda)
 
         return {
             "id": self.id,
@@ -567,8 +569,18 @@ class Producto(db.Model):
             "etiqueta_uno": self.etiqueta_uno.value,
             "etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",         
             "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else "",
-            "tienda": lista_id
-            # "nombre_tienda": [self.tienda.nombre_tienda]
+            "tienda": self.tienda_id            
+            # "tienda": 
+            # aqui en tienda serializo el nombre de la tienda osea de la tabla tienda nono yo le quito list
+            #si debe ser uno si lo intente, pero me daba el mismo error ya te lo enseño
+
+            # exacto pero como hago para a la hora de crear un producto en post, este conectado a la tienda
+            #si tengo la tienda, mmm como agrego su id
+            # entonces conectariamos el id de usuario con id de tienda y llegaria al post del producto cierto
+            # es 1 a 1 y de tienda a producto es 1 a muchos
+
+            # ahhh okok intentaremos eso
+
             # "nombre_tienda": [productos.tienda_id for productos in self.tienda_id]
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
             }    
