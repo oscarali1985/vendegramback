@@ -731,7 +731,7 @@ def post_productos():
             body = request.get_json()        
             producto = Producto(titulo=body['titulo'], foto=body['foto'], descripcion=body['descripcion'],
             precio=body['precio'], cantidad=body['cantidad'], etiqueta_uno=body['etiqueta_uno'], 
-            etiqueta_dos=body['etiqueta_dos'],etiqueta_tres=body['etiqueta_tres'],etiqueta_general=body['etiqueta_general'])
+            etiqueta_dos=body['etiqueta_dos'],etiqueta_tres=body['etiqueta_tres'],etiqueta_general=body['etiqueta_general'], tienda_id=body['tienda_id'] )
             #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
             print("imprimiento")
             print (jsonify(producto.serialize()))
