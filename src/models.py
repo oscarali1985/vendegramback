@@ -568,7 +568,7 @@ class Producto(db.Model):
         return '<Producto %r>' % self.titulo       
         
 
-    def serialize(self):
+    def serializer(self):
 
         # tienda_list = [self.tienda]
         # lista_id = []
@@ -600,9 +600,43 @@ class Producto(db.Model):
 
             # "nombre_tienda": [productos.tienda_id for productos in self.tienda_id]
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
-            }    
+            }
 
-#"etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",
+    def serialize(self):
+    
+        # tienda_list = [self.tienda]
+        # lista_id = []
+        # for tienda in tienda_list:
+        #     lista_id.append(tienda.nombre_tienda)
+
+        return {
+            "id": self.id,
+            "titulo": self.titulo,
+            "foto": self.foto,
+            "descripcion": self.descripcion,
+            "precio": self.precio,
+            "cantidad": self.cantidad,
+            "etiqueta_general": self.etiqueta_general.value,
+            "etiqueta_uno": self.etiqueta_uno.value,
+            "etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",         
+            "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else "",
+            "tienda": self.tienda.nombre_tienda 
+        }         
+            # "tienda": 
+            # aqui en tienda serializo el nombre de la tienda osea de la tabla tienda nono yo le quito list
+            #si debe ser uno si lo intente, pero me daba el mismo error ya te lo enseño
+
+            # exacto pero como hago para a la hora de crear un producto en post, este conectado a la tienda
+            #si tengo la tienda, mmm como agrego su id
+            # entonces conectariamos el id de usuario con id de tienda y llegaria al post del producto cierto
+            # es 1 a 1 y de tienda a producto es 1 a muchos
+
+            # ahhh okok intentaremos eso
+
+            # "nombre_tienda": [productos.tienda_id for productos in self.tienda_id]
+            # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
+
+            #"etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",
                 
 
 
@@ -627,5 +661,3 @@ class Producto(db.Model):
 ########################
 
 
-
-  
