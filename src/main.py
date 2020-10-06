@@ -727,26 +727,33 @@ def todos_productos():
 
 def post_productos():
         if request.method == "POST":
+            
         # METODO POST: crear una variable y asignarle el nuevo producto con los datos validados
-            body = request.get_json()        
-            producto = Producto(titulo=body['titulo'], foto=body['foto'], descripcion=body['descripcion'],
-            precio=body['precio'], cantidad=body['cantidad'], etiqueta_uno=body['etiqueta_uno'], 
-            etiqueta_dos=body['etiqueta_dos'],etiqueta_tres=body['etiqueta_tres'],etiqueta_general=body['etiqueta_general'], tienda_id=body['tienda_id'] )
-            #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
-            print("imprimiento")
-            print (jsonify(producto.serializer()))
-            db.session.add(producto)
-        try:
-            db.session.commit()
-            # devolvemos el nuevo donante serializado y 201_CREATED
-            return jsonify(producto.serialize()), 201
-        except Exception as error:
-            db.session.rollback()
-            print(f"{error.args} {type(error)}")
-            # devolvemos "mira, tuvimos este error..."
-            return jsonify({
-                "resultado1": f"{error.args}"
-            }), 500
+            body = request.get_json()    
+
+            #Se valida si la tienda existe
+            tienda = Tienda.query.get(body['tienda_id'])
+            if tienda is None:
+                raise APIException(f'La tienda a la cual se desea agregar el producto no existe, Verifique la infomracion', status_code=404)
+            else:
+                producto = Producto(titulo=body['titulo'], foto=body['foto'], descripcion=body['descripcion'],
+                precio=body['precio'], cantidad=body['cantidad'], etiqueta_uno=body['etiqueta_uno'], 
+                etiqueta_dos=body['etiqueta_dos'],etiqueta_tres=body['etiqueta_tres'],etiqueta_general=body['etiqueta_general'], tienda_id=body['tienda_id'] )
+                #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
+                print("imprimiento")
+                print (jsonify(producto.serializer()))
+                db.session.add(producto)
+            try:
+                db.session.commit()
+                # devolvemos el nuevo donante serializado y 201_CREATED
+                return jsonify(producto.serialize()), 201
+            except Exception as error:
+                db.session.rollback()
+                print(f"{error.args} {type(error)}")
+                # devolvemos "mira, tuvimos este error..."
+                return jsonify({
+                    "resultado1": f"{error.args}"
+                }), 500
 
 ##########  4.- Eliminar un producto DELETE /producto/{producto_id} ########### 
 
