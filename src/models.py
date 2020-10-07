@@ -71,6 +71,53 @@ class Usuario(db.Model):
     def __repr__(self):
         return '<Usuario %r>' % self.correo
 
+
+    @classmethod
+    def cargar(cls):
+        """
+            abre el archivo usuario.json y carga en la 
+            variable usuarios objetos usuario para cada
+            uno de los diccionarios de la lista
+        """
+        usuario = []
+        try:
+            with open("./usuario.json", "r") as usuario_archivo:
+                usuario_diccionarios = json.load(usuario_archivo)
+                for usuario in usuario_diccionarios:
+                    nuevo_usuario = cls.registrarse(
+                        usuario["nombre"],
+                        usuario["apellido"],
+                        usuario["nombre_usuario"],
+                        usuario["fecha_nacimiento"],
+                        usuario["correo"],
+                        usuario["telefono"],
+                        usuario["clave"],
+                        usuario["foto_perfil"],
+                        usuario["administrador"],
+                        usuario["suscripcion"]
+                    )
+                    usuario.append(nuevo_usuario)
+        except:
+            with open("./usuario.json", "w") as usuario_archivo:
+                pass
+        return usuario
+
+    @staticmethod
+    def salvar(usuarios):
+        """
+            guarda usuario en formato json en el archivo
+            correspondiente
+        """
+        with open("./usuario.json", "w") as usuario_archivo:
+            usuarios_serializados = []
+            for usuario in usuarios:
+                usuarios_serializados.append(Usuario.serializar())
+            json.dump(usuarios_serializados, usuario_archivo)
+
+
+
+
+
     @classmethod
     def registrarse(cls, nombre, apellido, nombre_usuario, fecha_nacimiento, correo, telefono, clave, foto_perfil, administrador, suscripcion):
         """
@@ -387,6 +434,51 @@ class Tienda(db.Model):
         self.zona_dos = Zona(zona_dos) if zona_dos else None
         self.zona_tres = Zona(zona_tres) if zona_tres else None 
 
+
+    @classmethod
+    def cargar(cls):
+        """
+            abre el archivo donante.json y carga en la 
+            variable donantes objetos donante para cada
+            uno de los diccionarios de la lista
+        """
+        tienda = []
+        try:
+            with open("./tienda.json", "r") as tienda_archivo:
+                tiendas_diccionarios = json.load(tienda_archivo)
+                for tienda in tiendas_diccionarios:
+                    nuevo_tienda = cls.nuevo(
+                        tienda["nombre_tienda"],
+                        tienda["correo_tienda"],
+                        tienda["telefono_tienda"],
+                        tienda["foto_tienda"],
+                        tienda["facebook_tienda"],
+                        tienda["instagram_tienda"],
+                        tienda["twitter_tienda"],
+                        tienda["zona_general"],
+                        tienda["zona_uno"],
+                        tienda["zona_dos"],
+                        tienda["zona_tres"]
+                    )
+                    tienda.append(nuevo_tienda)
+        except:
+            with open("./tienda.json", "w") as tienda_archivo:
+                pass
+        return tienda
+
+    @staticmethod
+    def salvar(tiendas):
+        """
+            guarda tienda en formato json en el archivo
+            correspondiente
+        """
+        with open("./tienda.json", "w") as tienda_archivo:
+            tiendas_serializados = []
+            for tienda in tiendas:
+                tiendas_serializados.append(Tienda.serialize())
+            json.dump(tiendas_serializados, tienda_archivo)
+
+
     @classmethod
     def nuevo(cls, nombre_tienda, correo_tienda, telefono_tienda, foto_tienda, facebook_tienda, 
     instagram_tienda, twitter_tienda, zona_general, zona_uno, zona_dos, zona_tres):
@@ -520,6 +612,50 @@ class Producto(db.Model):
         self.etiqueta_dos = Etiqueta(etiqueta_dos) if etiqueta_dos else None
         self.etiqueta_tres = Etiqueta(etiqueta_tres) if etiqueta_tres else None 
         self.tienda_id = tienda_id  
+
+
+    @classmethod
+    def cargar(cls):
+        """
+            abre el archivo producto.json y carga en la 
+            variable productos objetos producto para cada
+            uno de los diccionarios de la lista
+        """
+        producto = []
+        try:
+            with open("./producto.json", "r") as producto_archivo:
+                producto_diccionarios = json.load(producto_archivo)
+                for producto in producto_diccionarios:
+                    nuevo_producto = cls.nuevo(
+                        producto["titulo"],
+                        producto["foto"],
+                        producto["descripcion"],
+                        producto["precio"],
+                        producto["cantidad"],
+                        producto["etiqueta_general"],
+                        producto["etiqueta_uno"],
+                        producto["etiqueta_dos"],
+                        producto["etiqueta_tres"],
+                        producto["tienda_id"]
+                    )
+                    producto.append(nuevo_producto)
+        except:
+            with open("./producto.json", "w") as producto_archivo:
+                pass
+        return producto
+
+    @staticmethod
+    def salvar(productos):
+        """
+            guarda producto en formato json en el archivo
+            correspondiente
+        """
+        with open("./producto.json", "w") as producto_archivo:
+            productos_serializados = []
+            for producto in productos:
+                productos_serializados.append(Producto.serialize())
+            json.dump(productos_serializados, producto_archivo)
+
 
     @classmethod
     def nuevo(cls, titulo, foto, descripcion, precio, cantidad, etiqueta_general, etiqueta_uno, etiqueta_dos, etiqueta_tres, tienda_id):
@@ -659,7 +795,3 @@ class Producto(db.Model):
 #    Calificacion
 #
 ########################
-
-
-
-  

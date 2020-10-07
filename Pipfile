@@ -20,6 +20,7 @@ mysqlclient = "*"
 flask-admin = "*"
 requests = "*"
 flask-jwt-simple = "*"
+populate="python3 populate_db.py"
 
 [requires]
 python_version = "3.8.5"

@@ -1,0 +1,55 @@
+{
+    "tienda": 
+    [
+        {
+            "correo_tienda": "kislev4558@gmail.com",
+            "facebook_tienda": "algo",
+            "foto_tienda": "url",
+            "instagram_tienda": "algo",
+            "nombre_tienda": "kissy4558",
+            "telefono_tienda": "04142194921",
+            "twitter_tienda": null,
+            "zona_dos": "Antimano",
+            "zona_general": "Miranda",
+            "zona_tres": "Altagracia",
+            "zona_uno": "Catedral"
+        }
+
+    ],
+
+    "producto":
+
+    [
+        {
+            "cantidad": 30,
+            "descripcion": "bebida dulce",
+            "etiqueta_dos": "enlatados",
+            "etiqueta_general": "productos",
+            "etiqueta_tres": "alimentos",
+            "etiqueta_uno": "alimentos",
+            "foto": "foto",
+            "precio": 20,
+            "titulo": "lipton",
+            "tienda_id": 1
+          }
+
+    ],    
+
+    "usuario":
+
+    [
+        {
+            "nombre": "Oscar Ali",
+            "apellido": "Mariño",
+            "nombre_usuario": "oscarali1984",
+            "fecha_nacimiento": "1985/05/25",
+            "correo": "oscar1985@gmail.com",
+            "telefono": "584126147743",
+            "clave":"1234",
+            "foto_perfil": "foto",
+            "administrador": true,
+            "suscripcion": null
+          }
+
+    ]   
+} 
