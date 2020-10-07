@@ -338,25 +338,25 @@ class Suscripcion(db.Model):
 
 
 
-        """
-            normalizacion de nombre foto, etc...
-            crea un objeto de la clase tienda con
-            esa normalizacion y devuelve la instancia creada.
-        """
-        nuevo_tienda = cls(
-            nombre_tienda,
-            correo_tienda,
-            telefono_tienda,
-            foto_tienda,
-            facebook_tienda,
-            instagram_tienda,
-            twitter_tienda,
-            zona_general,
-            zona_uno,
-            zona_dos,
-            zona_tres
-        )
-        return nuevo_tienda 
+        # """
+        #     normalizacion de nombre foto, etc...
+        #     crea un objeto de la clase tienda con
+        #     esa normalizacion y devuelve la instancia creada.
+        # """
+        # nuevo_tienda = cls(
+        #     nombre_tienda,
+        #     correo_tienda,
+        #     telefono_tienda,
+        #     foto_tienda,
+        #     facebook_tienda,
+        #     instagram_tienda,
+        #     twitter_tienda,
+        #     zona_general,
+        #     zona_uno,
+        #     zona_dos,
+        #     zona_tres
+        # )
+        # return nuevo_tienda 
 
 ########################191
 #
