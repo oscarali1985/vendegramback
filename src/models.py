@@ -150,7 +150,7 @@ class Usuario(db.Model):
         tienda_list = self.tienda
         lista_id = []
         for tienda in tienda_list:
-            lista_id.append(tienda.nombre_tienda),
+            # lista_id.append(tienda.nombre_tienda),
             lista_id.append(tienda.id)
 
         date_str = str(self.fecha_nacimiento)
@@ -553,7 +553,7 @@ class Tienda(db.Model):
         producto_list = self.productos
         lista_id = []
         for producto in producto_list:
-            lista_id.append(producto.titulo),
+            # lista_id.append(producto.titulo),
             lista_id.append(producto.id)
 
         return {
@@ -580,7 +580,7 @@ class Tienda(db.Model):
         producto_list = self.productos
         lista_id = []
         for producto in producto_list:
-            lista_id.append(producto.titulo),
+            # lista_id.append(producto.titulo),
             lista_id.append(producto.id)
 
         return {
