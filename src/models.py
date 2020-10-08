@@ -29,6 +29,7 @@ class Usuario(db.Model):
     administrador = db.Column(db.Boolean(), unique=False, nullable=False)
     suscripcion = db.Column(db.Integer, unique=False, nullable=True)
     suscripciones = db.relationship("Suscripcion", backref="usuario") 
+    tienda = db.relationship("Tienda", backref="usuario") 
     fecha_registro = db.Column(db.Date())
 
     #usuario_id = db.relationship("Tienda", backref="usuario", uselist=False)
@@ -146,6 +147,12 @@ class Usuario(db.Model):
 
     def serializar(self):
 
+        tienda_list = self.tienda
+        lista_id = []
+        for tienda in tienda_list:
+            lista_id.append(tienda.nombre_tienda),
+            lista_id.append(tienda.id)
+
         date_str = str(self.fecha_nacimiento)
         date_object = datetime.strptime(date_str, '%Y-%m-%d').date()
 
@@ -164,7 +171,8 @@ class Usuario(db.Model):
             "foto_perfil":self.foto_perfil,
             "suscripcion":self.suscripcion, 
             "administrador":self.administrador,
-            "fecha_registro":datereg_str
+            "fecha_registro":datereg_str,
+            "tienda": lista_id
         }
 
 
@@ -253,18 +261,20 @@ class Suscripcion(db.Model):
     def __init__(self, plan, nombre_tienda):
         self.plan = Planes(plan),
         self.fecha_registro = date.today()
+        self.usuario_id = usuario_id
         # self.nombre_tienda = Tienda(nombre_tienda)
 
 
     @classmethod
-    def nuevo_sub(cls, plan):
+    def nuevo_sub(cls, plan, usuario_id):
         """
             normalizacion de nombre foto, etc...
             crea un objeto de la clase Suscripcion con
             esa normalizacion y devuelve la instancia creada.
         """
         nuevo_suscriptor = cls(
-            plan
+            plan,
+            usuario_id
         )
         return nuevo_suscriptor 
 
@@ -285,7 +295,8 @@ class Suscripcion(db.Model):
         return {
             "id": self.id,
             "plan": self.plan.value,
-            "fecha_registro":datereg_str
+            "fecha_registro":datereg_str,
+            "usuario_id": self.usuario_id
             # 'tienda': self.tienda.nombre_tienda
             # "tienda": [self.tienda.nombre_tienda]
         }
@@ -338,25 +349,25 @@ class Suscripcion(db.Model):
 
 
 
-        # """
-        #     normalizacion de nombre foto, etc...
-        #     crea un objeto de la clase tienda con
-        #     esa normalizacion y devuelve la instancia creada.
-        # """
-        # nuevo_tienda = cls(
-        #     nombre_tienda,
-        #     correo_tienda,
-        #     telefono_tienda,
-        #     foto_tienda,
-        #     facebook_tienda,
-        #     instagram_tienda,
-        #     twitter_tienda,
-        #     zona_general,
-        #     zona_uno,
-        #     zona_dos,
-        #     zona_tres
-        # )
-        # return nuevo_tienda 
+        """
+            normalizacion de nombre foto, etc...
+            crea un objeto de la clase tienda con
+            esa normalizacion y devuelve la instancia creada.
+        """
+        nuevo_tienda = cls(
+            nombre_tienda,
+            correo_tienda,
+            telefono_tienda,
+            foto_tienda,
+            facebook_tienda,
+            instagram_tienda,
+            twitter_tienda,
+            zona_general,
+            zona_uno,
+            zona_dos,
+            zona_tres
+        )
+        return nuevo_tienda 
 
 ########################191
 #
@@ -417,11 +428,12 @@ class Tienda(db.Model):
     zona_dos = db.Column(db.Enum(Zona), nullable=True)
     zona_tres = db.Column(db.Enum(Zona), nullable=True) 
     productos = db.relationship("Producto", backref="tienda") 
+    usuario_id = db.Column(db.Integer, ForeignKey('usuario.id'))
 
 
 
     def __init__(self, nombre_tienda, correo_tienda, telefono_tienda, foto_tienda, facebook_tienda, 
-    instagram_tienda, twitter_tienda, zona_general, zona_uno, zona_dos, zona_tres):
+    instagram_tienda, twitter_tienda, zona_general, zona_uno, zona_dos, zona_tres, usuario_id):
         self.nombre_tienda = nombre_tienda
         self.correo_tienda = correo_tienda
         self.telefono_tienda = telefono_tienda
@@ -433,6 +445,7 @@ class Tienda(db.Model):
         self.zona_uno = Zona(zona_uno) if zona_uno else None
         self.zona_dos = Zona(zona_dos) if zona_dos else None
         self.zona_tres = Zona(zona_tres) if zona_tres else None 
+        self.usuario_id = usuario_id
 
 
     @classmethod
@@ -458,7 +471,8 @@ class Tienda(db.Model):
                         tienda["zona_general"],
                         tienda["zona_uno"],
                         tienda["zona_dos"],
-                        tienda["zona_tres"]
+                        tienda["zona_tres"],
+                        tienda["usuario_id"]
                     )
                     tienda.append(nuevo_tienda)
         except:
@@ -481,7 +495,7 @@ class Tienda(db.Model):
 
     @classmethod
     def nuevo(cls, nombre_tienda, correo_tienda, telefono_tienda, foto_tienda, facebook_tienda, 
-    instagram_tienda, twitter_tienda, zona_general, zona_uno, zona_dos, zona_tres):
+    instagram_tienda, twitter_tienda, zona_general, zona_uno, zona_dos, zona_tres, usuario_id):
 
         """
             normalizacion de nombre foto, etc...
@@ -499,7 +513,8 @@ class Tienda(db.Model):
             zona_general,
             zona_uno,
             zona_dos,
-            zona_tres
+            zona_tres,
+            usuario_id
         )
         return nuevo_tienda 
 
@@ -538,7 +553,8 @@ class Tienda(db.Model):
         producto_list = self.productos
         lista_id = []
         for producto in producto_list:
-            lista_id.append(producto.titulo)
+            lista_id.append(producto.titulo),
+            lista_id.append(producto.id)
 
         return {
             "id": self.id,
@@ -553,10 +569,39 @@ class Tienda(db.Model):
             "zona_uno": self.zona_uno.value if self.zona_uno else "",
             "zona_dos": self.zona_dos.value if self.zona_dos else "",
             "zona_tres": self.zona_tres.value if self.zona_tres else "",
-            "productos": lista_id
+            "productos": lista_id,
+            "usuario_id": self.usuario_id,
+            "usuario_nombre": self.usuario.nombre
             # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
             }    
              
+    def serializer(self):
+
+        producto_list = self.productos
+        lista_id = []
+        for producto in producto_list:
+            lista_id.append(producto.titulo),
+            lista_id.append(producto.id)
+
+        return {
+            "id": self.id,
+            "nombre_tienda": self.nombre_tienda,
+            "correo_tienda": self.correo_tienda,
+            "telefono_tienda": self.telefono_tienda,
+            "foto_tienda": self.foto_tienda,
+            "facebook_tienda": self.facebook_tienda,
+            "instagram_tienda": self.instagram_tienda,
+            "twitter_tienda": self.twitter_tienda,
+            "zona_general": self.zona_general.value,
+            "zona_uno": self.zona_uno.value if self.zona_uno else "",
+            "zona_dos": self.zona_dos.value if self.zona_dos else "",
+            "zona_tres": self.zona_tres.value if self.zona_tres else "",
+            "productos": lista_id,
+            "usuario_id": self.usuario_id
+            }
+
+
+
 
 
 ########################136
@@ -756,7 +801,8 @@ class Producto(db.Model):
             "etiqueta_uno": self.etiqueta_uno.value,
             "etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",         
             "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else "",
-            "tienda": self.tienda.nombre_tienda
+            "tienda": self.tienda.nombre_tienda,
+            "tienda_id": self.tienda_id
         }          
             # "tienda": 
             # aqui en tienda serializo el nombre de la tienda osea de la tabla tienda nono yo le quito list

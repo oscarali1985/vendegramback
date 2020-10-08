@@ -181,10 +181,7 @@ def crud_usuario(id):
             usuario = Usuario.query.get(id)
             # verificar si el usuario con id usuario_id existe
             if isinstance(usuario, Usuario):
-                if request.method == "GET":
-                    # devolver el usuario serializado y jsonificado. Y 200
-                    return jsonify(usuario.serializar()), 200
-                elif request.method == "PUT":
+                if request.method == "PUT":
                     # recuperar diccionario con insumos del body del request
                     diccionario = request.get_json()
                     # actualizar propiedades que vengan en el diccionario
@@ -230,6 +227,21 @@ def crud_usuario(id):
 
     
 
+@app.route('/usuario/<int:usuario_id>', methods=["GET"])
+def getSpecificUsuario(usuario_id):
+
+    if request.method == "GET":
+        usuario = Usuario.query.filter(Usuario.id == usuario_id)
+        usuario_list = list(map(lambda usuario: usuario.serializar(), usuario))
+
+        if usuario_list == []:
+            msj="no se encontro el usuario ingresado"
+            return jsonify(msj), 200
+        else:
+            return jsonify(usuario_list), 200
+    else:
+            response_body = {"msj":"Metodo invalido request"}
+            return jsonify(response_body), 400
 
 
 
@@ -340,6 +352,23 @@ def actualizar_suscripcion(suscripcion_id):
         }), 500    
 
 
+@app.route('/suscripcion/<int:suscripcion_id>', methods=["GET"])
+def getSpecificSuscripcion(suscripcion_id):
+
+    if request.method == "GET":
+        suscripcion = Suscripcion.query.filter(Suscripcion.id == suscripcion_id)
+        suscripcion_list = list(map(lambda suscripcion: suscripcion.serialize(), suscripcion))
+
+        if suscripcion_list == []:
+            msj="no se encontro la suscripcion ingresada"
+            return jsonify(msj), 200
+        else:
+            return jsonify(suscripcion_list), 200
+    else:
+            response_body = {"msj":"Metodo invalido request"}
+            return jsonify(response_body), 400
+
+
 
 
 
@@ -378,7 +407,7 @@ def actualizar_suscripcion(suscripcion_id):
 #####  1.-Obtenga una lista de todos las tiendas GET /tienda;                         tambien filtra por nombre si recibe el parametro en la url   #########
     ##########  2.- Crear un nuevo tienda POST / ########### 
 
-@app.route('/tienda', methods=["GET", "POST"])
+@app.route('/tienda', methods=["GET"])
 
 def todos_tiendas():
     if request.method == "GET":
@@ -430,28 +459,41 @@ def todos_tiendas():
                 "resultado": "revise los valores de su solicitud"
             }), 400
 
-        # METODO POST: crear una variable y asignarle el nuevo producto con los datos validados
-        body = request.get_json()        
-        tienda = Tienda(nombre_tienda=body['nombre_tienda'], correo_tienda=body['correo_tienda'], telefono_tienda=body['telefono_tienda'],
-        foto_tienda=body['foto_tienda'], facebook_tienda=body['facebook_tienda'], instagram_tienda=body['instagram_tienda'], 
-        twitter_tienda=body['twitter_tienda'],zona_general=body['zona_general'],zona_uno=body['zona_uno'],zona_dos=body['zona_dos'],zona_tres=body['zona_tres'])
-        #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
-        print("imprimiento")
-        print (jsonify(tienda.serialize()))
-        db.session.add(tienda)
-        try:
-            db.session.commit()
-            # devolvemos el nuevo donante serializado y 201_CREATED
-            return jsonify(tienda.serialize()), 201
-        except Exception as error:
-            db.session.rollback()
-            print(f"{error.args} {type(error)}")
-            # devolvemos "mira, tuvimos este error..."
-            return jsonify({
-                "resultado2": f"{error.args}"
-            }), 500
 
-##########  4.- Eliminar un producto DELETE /producto/{producto_id} ########### 
+
+@app.route('/tienda', methods=["POST"])
+
+def post_tiendas():
+        if request.method == "POST":
+            
+        # METODO POST: crear una variable y asignarle el nuevo tienda con los datos validados
+            body = request.get_json()    
+
+            #Se valida si la usuario existe
+            usuario = Usuario.query.get(body['usuario_id'])
+            if usuario is None:
+                raise APIException(f'La usuario a la cual se desea agregar el tienda no existe, Verifique la infomracion', status_code=404)
+            else:
+                tienda = Tienda(nombre_tienda=body['nombre_tienda'], correo_tienda=body['correo_tienda'], telefono_tienda=body['telefono_tienda'],
+                foto_tienda=body['foto_tienda'], facebook_tienda=body['facebook_tienda'], instagram_tienda=body['instagram_tienda'], 
+                twitter_tienda=body['twitter_tienda'],zona_general=body['zona_general'],zona_uno=body['zona_uno'],zona_dos=body['zona_dos'],zona_tres=body['zona_tres'],usuario_id=body['usuario_id'] )
+                #   agregar a la sesión de base de datos (sqlalchemy) y hacer commit de la transacción
+                print("imprimiento")
+                print (jsonify(tienda.serializer()))
+                db.session.add(tienda)
+            try:
+                db.session.commit()
+                # devolvemos el nuevo donante serializado y 201_CREATED
+                return jsonify(tienda.serialize()), 201
+            except Exception as error:
+                db.session.rollback()
+                print(f"{error.args} {type(error)}")
+                # devolvemos "mira, tuvimos este error..."
+                return jsonify({
+                    "resultado1": f"{error.args}"
+                }), 500
+
+
 
 @app.route('/tienda/<int:tienda_id>', methods=['DELETE'])
 def eliminar_tienda(tienda_id):
@@ -499,6 +541,21 @@ def actualizar_tienda(tienda_id):
 
 
 
+@app.route('/tienda/<int:tienda_id>', methods=["GET"])
+def getSpecificTienda(tienda_id):
+
+    if request.method == "GET":
+        tienda = Tienda.query.filter(Tienda.id == tienda_id)
+        tienda_list = list(map(lambda tienda: tienda.serialize(), tienda))
+
+        if tienda_list == []:
+            msj="no se encontro la tienda ingresada"
+            return jsonify(msj), 200
+        else:
+            return jsonify(tienda_list), 200
+    else:
+            response_body = {"msj":"Metodo invalido request"}
+            return jsonify(response_body), 400
 
 
 
@@ -802,6 +859,21 @@ def actualizar_producto(producto_id):
 
 
 
+@app.route('/producto/<int:producto_id>', methods=["GET"])
+def getSpecificproducto(producto_id):
+
+    if request.method == "GET":
+        producto = Producto.query.filter(Producto.id == producto_id)
+        producto_list = list(map(lambda producto: producto.serialize(), producto))
+
+        if producto_list == []:
+            msj="no se encontro el producto ingresada"
+            return jsonify(msj), 200
+        else:
+            return jsonify(producto_list), 200
+    else:
+            response_body = {"msj":"Metodo invalido request"}
+            return jsonify(response_body), 400
 
 
 
