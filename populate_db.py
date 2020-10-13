@@ -4,6 +4,7 @@ from src.models import db, Usuario, Producto, Tienda, Suscripcion
 import json
 import os
 
+
 # iniciar la aplicación
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')

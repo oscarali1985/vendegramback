@@ -2,24 +2,41 @@
 Este modulo carga la Base de datos y agrega los endpoints
 """
 import os
-from flask import Flask, request, jsonify, url_for
+import uuid
+from flask import Flask, request, jsonify, url_for, make_response, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap, validate_email_syntax
 from admin import setup_admin
-from models import db, Usuario, Producto, Tienda, Suscripcion
+from models import db, Usuario, Producto, Tienda, Suscripcion, ProductoImage
 from smail import sendEmail
 from stele import sendTelegram
 from base64 import b64encode
+import cloudinary.uploader as uploader
+from werkzeug.utils import secure_filename
 from flask_jwt_simple import (
     JWTManager, jwt_required, create_jwt, get_jwt_identity
 )
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 app.url_map.strict_slashes = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
+app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER')
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
+
+
+app.config.from_mapping(
+    CLOUDINARY_URL=os.environ.get("CLOUDINARY_URL")
+)
+# cloud_config.update = ({
+#     "cloud_name": os.environ.get("CLOUD_NAME"),
+#     "api_key": os.environ.get("API_KEY"),
+#     "api_secret": os.environ.get("API_SECRET")
+# })
+
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 MIGRATE = Migrate(app, db)
 db.init_app(app)
 jwt = JWTManager(app)
@@ -963,14 +980,10 @@ def manejar_ingreso():
         else:
             if usuario.check_password(input_data["clave"]):
                 #exito
-                token = create_jwt(identity = usuario.id)
-                return jsonify({
-                    "token": token,
-                    "id_usuario": usuario.id,
-                    "correo":usuario.correo,
-                    "isadmin":usuario.administrador
-                }), 200
-
+                jwt = create_jwt(identity = usuario.id)
+                reenvio = usuario.serializar()
+                reenvio["jwt"] = jwt
+                return jsonify(reenvio), 200
             else:
                 return jsonify({
             "resultado":"Verifique su clave"
@@ -1149,6 +1162,244 @@ def cambioclavecorreo(nombre_usuario):
         return jsonify({
                     "resultado": "el contacto que ingreso no existe..."
                 }), 404
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################159
+#
+#    Claudinary
+#
+########################
+
+
+
+
+# producto images endpoint
+@app.route("/producto/<int:producto_id>/images", methods=["POST", "GET"])
+@app.route("/producto/<int:producto_id>/images/<int:id>", methods=["DELETE"])
+def handle_producto_images(producto_id, id=None):
+    """ 
+        GET to receive all producto images as a list of objects,
+        POST to create a new producto image.
+    """
+    headers = {
+        "Content-Type": "application/json"
+    }
+    # check if producto exists
+    if Producto.query.filter_by(id=producto_id).first():
+        # producto exists
+
+        if request.method == "GET":
+            # get producto images and return them
+            # producto_images = ProductoImage.query.filter(Producto.id == producto_id).all()
+            producto_images = ProductoImage.query.filter_by(producto_id=producto_id).all()
+            response_body = []
+            
+            if len(producto_images) > 0:
+                for image in producto_images:
+                    response_body.append(image.serialize())
+                status_code = 200
+            else:
+                response_body = []
+                status_code = 200
+
+        elif request.method == "POST":
+            # produc = Producto.query.all()
+            # titu = request.args.get(id)
+            # check if producto has less than 5 images stored
+            # if len(ProductoImage.query.filter(Producto.id == producto_id).all()) < 5:
+            # if len(UserImage.query.filter_by(user_username=username).all()) < 5:
+            if len(ProductoImage.query.filter_by(producto_id=producto_id).all()) < 3:
+                # receive file, secure its name, save it and
+                # create object to store title and image_url
+
+                # podria ser el error aqui en el target?
+
+
+                target = os.path.join(UPLOAD_FOLDER, "images")
+                if not os.path.isdir(target):
+                    os.mkdir(target)  
+                try:
+                    image_file = request.files['file']
+                    filename = secure_filename(image_file.filename)
+                    extension = filename.rsplit(".", 1)[1]
+                    hash_name = uuid.uuid4().hex
+                    hashed_filename = ".".join([hash_name, extension])
+                    destination = os.path.join(target, hashed_filename)
+                    response = uploader.upload(image_file)
+                    print(f"{response.items()}")                      
+                    # sorry es este try, exacto q no teniamos file :s
+                    # alli estaba username, pero era para el endpoint /ernesto/image
+                    #entonces yo lo cambie a producto/<int:producto_id>/images
+                    # dice que title no esta definido en la linea 1244
+                    
+                    try:
+                        new_image = ProductoImage(request.form.get("title"), response["public_id"], response["secure_url"], producto_id)                        
+                        # new_image = ProductoImage(request.form.get("title"), destination, producto_id)
+                        db.session.add(new_image)  
+                       
+
+                        try:
+                            db.session.commit()
+                            # image_file.save(destination)
+                            response_body = {
+                                "result": "HTTP_201_CREATED. image created for producto"
+                            }
+                            status_code = 201
+                        # except IntegrityError:
+                        except Exception as error:
+                            db.session.rollback()
+                            response_body = {
+                                "result": f"HTTP_400_BAD_REQUEST. {type(error)} {error.args}"
+                            }
+                            status_code = 400
+                    except Exception as error:
+                        db.session.rollback()
+                        status_code = 400
+                        response_body = {
+                            "result": f"HTTP_400_BAD_REQUEST.{type(error)} {error.args}"
+                        }
+                except Exception as error:
+                    status_code = 400
+                    response_body = {
+                        "result": f"HTTP_400_BAD_REQUEST. {type(error)} {error.args}."
+                    }
+                
+                
+            else:
+                # producto has 5 images uploaded
+                response_body = {
+                    "result": "HTTP_404_BAD_REQUEST. No puedes subir mas de 3 imagenes para subir mas debe actualizar a plan basico ."
+                }
+                status_code = 404
+
+        elif request.method == "DELETE":
+            # producto wants to delete a certain image, check id
+            # id azul = id de producto // id amarillo = id de productoImage
+            if id != 0 and ProductoImage.query.filter_by(id=id).first():
+                image_to_delete = ProductoImage.query.filter_by(id=id).first()
+
+                response = uploader.destroy(image_to_delete.public_id)
+                if "result" in response and response["result"] == "ok":
+                                    
+                # url_parts = image_to_delete.image_url.rsplit("/", 2)
+                # path_filename = "/".join([url_parts[1], url_parts[2]])
+                # if os.path.exists(os.path.join(UPLOAD_FOLDER, path_filename)):
+                # os.remove(os.path.join(UPLOAD_FOLDER, path_filename))
+                    db.session.delete(image_to_delete)
+
+                    # db.session.commit()
+                    # response_body = {
+                    #     "result": "HTTP_204_NO_CONTENT. image deleted."
+                    # }
+                    # status_code = 204
+                    try:
+                        db.session.commit()
+                        response_body = {
+                            "result": "HTTP_204_NO_CONTENT. image deleted."
+                        }
+                        status_code = 204
+                    except Exception as error:
+                        db.session.rollback()
+                        response_body = {
+                            "result": f"HTTP_500_INTERNAL_SERVER_ERROR. {type(error)} {error.args}"
+                        }                    
+                else:
+                    response_body = {
+                        "result": f"HTTP_404_NOT_FOUND. {response['result'] if 'result' in response else 'image not found...'}"
+                    }
+                    status_code = 404
+
+        else:
+            # bad request method...
+            response_body = {
+                "result": "HTTP_400_BAD_REQUEST. This is not a valid method for this endpoint."
+            }
+            status_code = 400
+    else:
+        # producto doesn't exist
+        response_body = {
+            "result": "HTTP_400_BAD_REQUEST. cannot handle images for non existing product..."
+        }
+        status_code = 400
+
+    return make_response(
+        jsonify(response_body),
+        status_code,
+        headers
+    )
+
+# static image file serving
+@app.route("/src/static/images/<filename>", methods=["GET"])
+def serve_image(filename):
+    
+    secured_filename = secure_filename(filename)
+    image_path = os.path.join("images", secured_filename)
+    
+    if os.path.exists(os.path.join(app.static_folder, image_path)):
+        return send_from_directory(app.static_folder, image_path)
+    else:
+        return "HTTP_404_NOT_FOUND"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # this only runs if `$ python src/main.py` is executed

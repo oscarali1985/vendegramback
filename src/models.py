@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
 
-########################15
+########################
 #
 #    Usuarios
 #
@@ -644,6 +644,7 @@ class Producto(db.Model):
     etiqueta_dos = db.Column(db.Enum(Etiqueta), nullable=True)
     etiqueta_tres = db.Column(db.Enum(Etiqueta), nullable=True)
     tienda_id = db.Column(db.Integer, ForeignKey('tienda.id'))
+    images = db.relationship("ProductoImage", back_populates="producto")
 
 
     def __init__(self, titulo, foto, descripcion, precio, cantidad, etiqueta_general, etiqueta_uno, etiqueta_dos, etiqueta_tres, tienda_id):
@@ -768,27 +769,9 @@ class Producto(db.Model):
             "etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",         
             "etiqueta_tres": self.etiqueta_tres.value if self.etiqueta_tres else "",
             "tienda": self.tienda_id            
-            # "tienda": 
-            # aqui en tienda serializo el nombre de la tienda osea de la tabla tienda nono yo le quito list
-            #si debe ser uno si lo intente, pero me daba el mismo error ya te lo enseño
-
-            # exacto pero como hago para a la hora de crear un producto en post, este conectado a la tienda
-            #si tengo la tienda, mmm como agrego su id
-            # entonces conectariamos el id de usuario con id de tienda y llegaria al post del producto cierto
-            # es 1 a 1 y de tienda a producto es 1 a muchos
-
-            # ahhh okok intentaremos eso
-
-            # "nombre_tienda": [productos.tienda_id for productos in self.tienda_id]
-            # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
             }
 
     def serialize(self):
-    
-        # tienda_list = [self.tienda]
-        # lista_id = []
-        # for tienda in tienda_list:
-        #     lista_id.append(tienda.nombre_tienda)
 
         return {
             "id": self.id,
@@ -804,40 +787,42 @@ class Producto(db.Model):
             "tienda": self.tienda.nombre_tienda,
             "tienda_id": self.tienda_id
         }          
-            # "tienda": 
-            # aqui en tienda serializo el nombre de la tienda osea de la tabla tienda nono yo le quito list
-            #si debe ser uno si lo intente, pero me daba el mismo error ya te lo enseño
-
-            # exacto pero como hago para a la hora de crear un producto en post, este conectado a la tienda
-            #si tengo la tienda, mmm como agrego su id
-            # entonces conectariamos el id de usuario con id de tienda y llegaria al post del producto cierto
-            # es 1 a 1 y de tienda a producto es 1 a muchos
-
-            # ahhh okok intentaremos eso
-
-            # "nombre_tienda": [productos.tienda_id for productos in self.tienda_id]
-            # "groups": [subscription.group_id for subscription in self.subscriptions] ayuda para etiqueta
-
-#"etiqueta_dos": self.etiqueta_dos.value if self.etiqueta_dos else "",
+            
                 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ########################
 #
-#    Calificacion
+#    Claudinary
 #
 ########################
+
+
+
+class ProductoImage(db.Model):
+    """ image uploaded by producto """
+    __table_args__ = (
+        db.UniqueConstraint("title", "producto_id", name="unique_img_title_producto"),
+    )
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=False)
+    image_url = db.Column(db.String(500), nullable=False, unique=True)
+    public_id = db.Column(db.String(500), nullable=False, unique=True)
+    producto_id = db.Column(db.Integer, db.ForeignKey("producto.id"), nullable=False)
+    producto = db.relationship("Producto", back_populates="images")
+    
+
+    def __init__(self, title, public_id, image_url, producto_id):
+        self.title = title.strip()
+        self.image_url = image_url.strip()
+        self.producto_id = producto_id
+        self.public_id = public_id
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "image_url": self.image_url,
+            "producto_id": self.producto_id
+        }
+        #en la base de datos debe estar como title sorry :s, esta pegada :( no 

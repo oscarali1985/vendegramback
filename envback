@@ -1,0 +1,7 @@
+DB_CONNECTION_STRING=mysql+mysqlconnector://root@localhost/vendegram
+FLASK_APP_KEY="any key works"
+FLASK_APP=src/main.py
+FLASK_ENV=development
+PASSWORD_EMAIL="vendegram123*"
+TOKEN_TELE='1039242221:AAHqzyXt8Y-Nwfd35u0H-eNpKfVzxx9CB7k'
+JWT_SECRET_KEY='fkEXvCsWLenDkwcIISy2wUiQ8Pqtzfhhfdt7rQz0R3o='
