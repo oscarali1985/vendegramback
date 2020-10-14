@@ -14,9 +14,9 @@ flask-swagger = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
 mysql-connector-python = "*"
-flask-cors = {path = "./Flask_Cors-3.0.9-py2.py3-none-any.whl"}
+flask-cors = "*"
 gunicorn = "*"
-mysqlclient = {path = "./mysqlclient-1.4.6-cp38-cp38-win32.whl"}
+mysqlclient = "*"
 flask-admin = "*"
 requests = "*"
 flask-jwt-simple = "*"

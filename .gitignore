@@ -8,4 +8,5 @@ dist/*
 package.json
 migrations/*
 theia/*
+.vscode/*
 __pycache__/

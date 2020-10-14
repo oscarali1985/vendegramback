@@ -876,21 +876,29 @@ def actualizar_producto(producto_id):
 
 
 
+
 @app.route('/producto/<int:producto_id>', methods=["GET"])
 def getSpecificproducto(producto_id):
 
     if request.method == "GET":
-        producto = Producto.query.filter(Producto.id == producto_id)
-        producto_list = list(map(lambda producto: producto.serialize(), producto))
+        #producto = Producto.query.filter(Producto.id == producto_id)
+        producto = Producto.query.filter_by(id=producto_id).one_or_none()
+        print
+        #producto_list = list(map(lambda producto: producto.serialize(), producto))
+        producto_list = {}
+        #print(producto_list)
+        #print(type(producto_list))
 
-        if producto_list == []:
-            msj="no se encontro el producto ingresada"
-            return jsonify(msj), 200
+        if not producto  :
+            msj="no se encontro el producto ingresado"
+            return jsonify(msj), 400
         else:
+            producto_list = producto.serialize()
             return jsonify(producto_list), 200
     else:
             response_body = {"msj":"Metodo invalido request"}
             return jsonify(response_body), 400
+
 
 
 
