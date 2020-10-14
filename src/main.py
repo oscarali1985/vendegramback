@@ -875,8 +875,6 @@ def actualizar_producto(producto_id):
         }), 500    
 
 
-
-
 @app.route('/producto/<int:producto_id>', methods=["GET"])
 def getSpecificproducto(producto_id):
 
@@ -899,6 +897,27 @@ def getSpecificproducto(producto_id):
             response_body = {"msj":"Metodo invalido request"}
             return jsonify(response_body), 400
 
+@app.route('/productot/<int:tienda_id>', methods=["GET"])
+def getProductosbytienda(tienda_id):
+
+    if request.method == "GET":
+        #producto = Producto.query.filter(Producto.id == producto_id)
+        producto = Producto.query.filter_by(tienda_id=tienda_id)
+        
+        producto_list = list(map(lambda producto: producto.serialize(), producto))
+        
+        #print(producto_list)
+        #print(type(producto_list))
+
+        if not producto_list  :
+            msj="no se encontro el producto ingresado"
+            return jsonify(msj), 400
+        else:
+            
+            return jsonify(producto_list), 200
+    else:
+            response_body = {"msj":"Metodo invalido request"}
+            return jsonify(response_body), 400
 
 
 
@@ -914,9 +933,11 @@ def getSpecificproducto(producto_id):
 
 
 
-########################356
+
+
+########################917
 #
-#    Envoar ccorreo o mensajes telegram
+#    Enviar ccorreo o mensajes telegram
 #
 ########################
 
@@ -957,7 +978,7 @@ def SendTelegram():
         return response
 
 
-########################416
+########################960
 #
 #    Login
 #
@@ -1189,7 +1210,7 @@ def cambioclavecorreo(nombre_usuario):
 
 
 
-########################159
+########################1192
 #
 #    Claudinary
 #
