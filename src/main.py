@@ -1109,7 +1109,6 @@ def cambioclavealetaria(id):
 
 @app.route("/cambioclavecorreo/<nombre_usuario>", methods=["PUT"])
 
-
 def cambioclavecorreo(nombre_usuario):
     """
         PUT actualizar la clave de un usuario en particular
